@@ -5,6 +5,10 @@
 ## https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 ## has more thorough IDE-specific entries.
 ##
+
+/*/bin/
+/*/obj/
+.idea/
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
 # Build results
