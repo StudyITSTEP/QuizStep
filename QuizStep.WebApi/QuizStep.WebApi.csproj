@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\QuizStep.Application\QuizStep.Application.csproj" />
       <ProjectReference Include="..\QuizStep.Core\QuizStep.Core.csproj" />
       <ProjectReference Include="..\QuizStep.Infrastructure\QuizStep.Infrastructure.csproj" />
     </ItemGroup>

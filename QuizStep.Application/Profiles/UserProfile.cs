@@ -5,11 +5,14 @@ using QuizStep.Core.Entities;
 
 namespace QuizStep.Application.Profiles;
 
-public class UserProfile: Profile
+public class UserProfile : Profile
 {
     public UserProfile()
     {
-        CreateMap<User, LoginUserCommand>();
-        CreateMap<LoginDto, User>();
+        CreateMap<LoginUserCommand, User>();
+        CreateMap<User, LoginDto>();
+        CreateMap<RegisterUserCommand, User>()
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
+        CreateMap<User, RegisterDto>();
     }
 }
