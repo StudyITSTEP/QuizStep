@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using QuizStep.Application.DTOs.Test;
 using QuizStep.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,8 @@ namespace QuizStep.Application.Commands___Queries.Test
 {
     public class CreateTestCommand : IRequest<int>
     {
-        public string Name { get; set; } = null!;
-        public string? Description { get; set; }
-        public int CategoryId { get; set; }
-        public string CreatorId { get; set; } = null!;
-        public TestAccess? Access { get; set; }
+        public TestDto Test { get; set; }
+
+        public CreateTestCommand(TestDto test) { Test = test; }
     }
 }

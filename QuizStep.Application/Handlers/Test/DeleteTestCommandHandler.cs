@@ -21,17 +21,16 @@ namespace QuizStep.Application.Handlers.Test
 
         public async Task<Unit> Handle(DeleteTestCommand request, CancellationToken cancellationToken)
         {
-            var test = await _context.Tests
-                .FirstOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
+            var test = await _context.Tests.FindAsync(new object[] { request.Id }, cancellationToken);
 
             if (test == null)
                 throw new KeyNotFoundException($"Test with Id {request.Id} not found");
 
             _context.Tests.Remove(test);
-
             await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
         }
     }
+
 }

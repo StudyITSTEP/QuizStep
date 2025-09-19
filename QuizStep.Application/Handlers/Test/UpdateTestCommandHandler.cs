@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QuizStep.Application.Commands___Queries.Test;
 using QuizStep.Application.Interfaces;
@@ -14,30 +15,22 @@ namespace QuizStep.Application.Handlers.Test
     public class UpdateTestCommandHandler : IRequestHandler<UpdateTestCommand, Unit>
     {
         private readonly IApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public UpdateTestCommandHandler(IApplicationDbContext context)
+        public UpdateTestCommandHandler(IApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<Unit> Handle(UpdateTestCommand request, CancellationToken cancellationToken)
         {
-            var test = await _context.Tests.FirstOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
+            var test = await _context.Tests.FindAsync(new object[] { request.Test.Id }, cancellationToken);
 
             if (test == null)
-                throw new KeyNotFoundException($"Test with Id {request.Id} not found.");
+                throw new KeyNotFoundException($"Test with Id {request.Test.Id} not found");
 
-            if (!string.IsNullOrEmpty(request.Name))
-                test.Name = request.Name;
-
-            if (request.Description != null)
-                test.Description = request.Description;
-
-            if (request.CategoryId.HasValue)
-                test.CategoryId = request.CategoryId.Value;
-
-            if (request.Access.HasValue)
-                test.Access = request.Access.Value;
+            _mapper.Map(request.Test, test);
 
             await _context.SaveChangesAsync(cancellationToken);
 
