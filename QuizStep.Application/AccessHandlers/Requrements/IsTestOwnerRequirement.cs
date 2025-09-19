@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuizStep.Application.Handlers.Test
+namespace QuizStep.Application.AccessHandlers.Requrements
 {
     public class IsTestOwnerRequirement : IAuthorizationRequirement
     {
