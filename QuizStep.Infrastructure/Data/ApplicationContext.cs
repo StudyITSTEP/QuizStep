@@ -2,12 +2,13 @@ using MediatR;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using QuizStep.Application.Interfaces;
 using QuizStep.Core.Entities;
 using QuizStep.Core.Primitives;
 
 namespace QuizStep.Infrastructure.Data;
 
-public class ApplicationContext : IdentityDbContext<User>
+public class ApplicationContext : IdentityDbContext<User>, IApplicationDbContext
 {
     private readonly IPublisher _publisher;
 
@@ -15,6 +16,10 @@ public class ApplicationContext : IdentityDbContext<User>
     {
         _publisher = publisher;
     }
+
+    public DbSet<Test> Tests => Set<Test>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<User> Users => Set<User>();
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {

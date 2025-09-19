@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuizStep.Application.Handlers.Test;
+using QuizStep.Application.Interfaces;
 using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
 using QuizStep.Infrastructure.Data;
@@ -20,9 +21,9 @@ builder.Services.AddIdentityCore<User>()
 builder.Services.AddScoped<IAuthorizationHandler, IsTestOwnerHandler>();
 
 builder.Services.AddDbContext<ApplicationContext>(opts =>
-{
-    opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationContext>());
 
 var app = builder.Build();
 

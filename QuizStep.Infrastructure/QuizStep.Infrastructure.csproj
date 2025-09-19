@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\QuizStep.Application\QuizStep.Application.csproj" />
       <ProjectReference Include="..\QuizStep.Core\QuizStep.Core.csproj" />
     </ItemGroup>
 
