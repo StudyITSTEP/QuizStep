@@ -10,12 +10,7 @@ namespace QuizStep.Infrastructure.Repositories;
 public class JwtProvider: IJwtProvider
 {
     private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
-
-    public JwtProvider(JwtSecurityTokenHandler jwtSecurityTokenHandler)
-    {
-        _jwtSecurityTokenHandler = jwtSecurityTokenHandler;
-    }
-
+    
     public string GetJwt(User user)
     {
         var claims = new List<Claim>
