@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using QuizStep.Application.Handlers.Test;
 using QuizStep.Core.Entities;
 using QuizStep.Infrastructure.Data;
 
@@ -13,6 +15,14 @@ builder.Services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IAuthorizationHandler, IsTestOwnerHandler>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsTestOwner", policy =>
+    policy.Requirements.Add(new IsTestOwnerRequirement()));
+});
 
 builder.Services.AddDbContext<ApplicationContext>(opts =>
 {
