@@ -11,7 +11,7 @@ public class User: IdentityUser, IEntity
     
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    
+    public IEnumerable<RefreshToken> RefreshTokens { get; set; }
     public void Raise(DomainEvent e)
     {
         _events.Add(e);

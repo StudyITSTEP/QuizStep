@@ -15,5 +15,6 @@ public class UserProfile : Profile
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
         CreateMap<User, RegisterDto>();
         CreateMap<RegisterUserCommand, RegisterDto>().ReverseMap();
+        CreateMap<RefreshTokenCommand, RefreshTokenDto>().ReverseMap();
     }
 }

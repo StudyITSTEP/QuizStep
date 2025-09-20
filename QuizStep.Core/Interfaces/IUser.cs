@@ -21,4 +21,8 @@ public interface IUser
     Task<Result> SignInAsync(User user, string password);
     Task<string> GenerateEmailConfirmationTokenAsync(User user);
     Task<Result> ConfirmEmailAsync(User user, string token);
+    Task<string?> GenerateRefreshTokenAsync(string userId, TimeSpan? expiration = null);
+    Task RevokeRefreshTokenAsync(int tokenId);
+    Task RevokeRefreshTokensAsync(string userId);
+    Task<string?> RenewRefreshTokenAsync(string userId, string refreshToken,TimeSpan? expiration = null);
 }

@@ -4,11 +4,11 @@ public class Result
 {
     public bool Succeeded { get; }
     public bool Failed => !Succeeded;
-    public Error Error { get;  } = Error.None;
+    public Error? Error { get;  } = null;
 
-    private Result(bool succeeded, Error error)
+    private Result(bool succeeded, Error? error)
     {
-        if (succeeded && error != Error.None
+        if (succeeded && error != null
             || !succeeded && error == Error.None)
         {
             throw new ArgumentException("Invalid error", nameof(error));
@@ -17,6 +17,7 @@ public class Result
         Error = error;
     }
     
-    public static Result Success() => new Result(true, Error.None);
+    public static Result Success() => new Result(true, null);
     public static Result Failure(Error error) => new Result(false, error);
+    public static implicit operator bool(Result result) => result.Succeeded;
 }

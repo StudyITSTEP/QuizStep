@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuizStep.Infrastructure.Data;
@@ -11,9 +12,11 @@ using QuizStep.Infrastructure.Data;
 namespace QuizStep.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20250920162117_UpdateRefreshTokenNullable")]
+    partial class UpdateRefreshTokenNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,8 +182,6 @@ namespace QuizStep.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("RefreshTokens");
                 });
 
@@ -234,6 +235,9 @@ namespace QuizStep.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("RefreshTokenId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -252,6 +256,9 @@ namespace QuizStep.Infrastructure.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("RefreshTokenId")
+                        .IsUnique();
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -307,20 +314,19 @@ namespace QuizStep.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("QuizStep.Core.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("QuizStep.Core.Entities.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("QuizStep.Core.Entities.User", b =>
                 {
-                    b.Navigation("RefreshTokens");
+                    b.HasOne("QuizStep.Core.Entities.RefreshToken", "RefreshToken")
+                        .WithOne("User")
+                        .HasForeignKey("QuizStep.Core.Entities.User", "RefreshTokenId");
+
+                    b.Navigation("RefreshToken");
+                });
+
+            modelBuilder.Entity("QuizStep.Core.Entities.RefreshToken", b =>
+                {
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

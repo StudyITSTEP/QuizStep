@@ -12,16 +12,24 @@ public class ApplicationContext : IdentityDbContext<User>
 {
     private readonly IPublisher _publisher;
 
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+
     public ApplicationContext(DbContextOptions<ApplicationContext> options, IPublisher publisher) : base(options)
     {
         _publisher = publisher;
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+       
+        base.OnModelCreating(modelBuilder);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
         var events = ChangeTracker.Entries<IEntity>()
             .Select(e => e.Entity).Where(e => e.GetEvents().Any()).ToList();
-            
+
 
         var result = await base.SaveChangesAsync(cancellationToken);
 

@@ -21,13 +21,15 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginRe
 
     public async Task<LoginResultDto> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        var user = _mapper.Map<Core.Entities.User>(request);
+        var user = await _user.GetUserByEmailAsync(request.Email);
         var result = await _user.CheckPasswordAsync(user, request.Password!);
         LoginResultDto dto = new();
         if (result)
         {
             var token = await _user.GetAccessTokenAsync(user);
+            var refreshToken = await _user.GenerateRefreshTokenAsync(user.Id);
             dto.Token = token;
+            dto.RefreshToken = refreshToken!;
             dto.Result = Result.Success();
         }
         else
