@@ -1,24 +1,31 @@
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using QuizStep.Application.Commands___Queries.User;
+using QuizStep.Application.DTOs.User;
 
 namespace QuizStep.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController: ControllerBase
+public class AccountController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IMapper _mapper;
 
-    public AccountController(IMediator mediator)
+    public AccountController(IMediator mediator, IMapper mapper)
     {
         _mediator = mediator;
+        _mapper = mapper;
     }
-    
+
     [HttpPost]
     [Route("register")]
-    public async Task<IActionResult> Register(RegisterUserCommand command)
+    public async Task<IActionResult> Register(RegisterDto dto)
     {
+        var command = _mapper.Map<RegisterUserCommand>(dto);
+        command.ConfirmationLink = Url.Action(nameof(ConfirmEmail), "Account", null, Request.Scheme);
+
         var result = await _mediator.Send(command);
         return Ok(result);
     }
@@ -28,6 +35,14 @@ public class AccountController: ControllerBase
     public async Task<IActionResult> Login(LoginUserCommand command)
     {
         var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("email-confirm")]
+    public async Task<IActionResult> ConfirmEmail(string? token, string? email )
+    {
+        var result =  await _mediator.Send(new ConfirmEmailCommand(token, email));
         return Ok(result);
     }
 }

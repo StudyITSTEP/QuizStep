@@ -4,7 +4,7 @@ using QuizStep.Application.DTOs.User;
 
 namespace QuizStep.Application.Commands___Queries.User;
 
-public class LoginUserCommand: IRequest<LoginDto>
+public class LoginUserCommand: IRequest<LoginResultDto>
 {
     [Required]
     [EmailAddress]

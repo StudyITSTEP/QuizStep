@@ -4,7 +4,7 @@ using QuizStep.Application.DTOs.User;
 
 namespace QuizStep.Application.Commands___Queries.User;
 
-public class RegisterUserCommand: IRequest<RegisterDto>
+public class RegisterUserCommand: IRequest<RegisterResultDto>
 {
     [Required] public string? FirstName { get; set; }
     [Required] public string? LastName { get; set; }
@@ -14,8 +14,5 @@ public class RegisterUserCommand: IRequest<RegisterDto>
     [DataType(DataType.Password)]
     public string? Password { get; set; }
 
-    [Required]
-    [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-    public string? ConfirmPassword { get; set; }
+    public string? ConfirmationLink { get; set; }
 }

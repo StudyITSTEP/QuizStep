@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using QuizStep.Application.Commands___Queries.User;
@@ -23,11 +24,16 @@ builder.Services.AddIdentityCore<User>()
 
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IUser, UserRepository>();
+builder.Services.AddScoped<IEmailSender, EmailService>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
 builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile).Assembly);
 
 builder.Services.AddHttpContextAccessor();
+
+// Map Email class with configurations from appsettings.json
+var service = builder.Configuration.GetSection("EmailConfig").Get<EmailConfig>();
+builder.Services.AddSingleton(service);
 
 builder.Services.AddAuthentication(opts =>
     {
