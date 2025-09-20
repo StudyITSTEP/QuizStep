@@ -54,6 +54,16 @@ builder.Services.AddAuthentication(opts =>
             IssuerSigningKey = JwtConfig.GetSymmetricSecurityKey(),
             ValidateIssuerSigningKey = true
         };
+        
+        opts.Events = new JwtBearerEvents
+        {
+            
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("Token valid for: " + context.Principal.Identity?.Name);
+                return Task.CompletedTask;
+            }
+        };
     });
 builder.Services.AddAuthorization();
 
@@ -63,7 +73,12 @@ builder.Services.AddDbContext<ApplicationContext>(opts =>
 });
 
 var app = builder.Build();
-
+app.Use(async (context, next) =>
+{
+    var authHeader = context.Request.Headers["Authorization"].ToString();
+    Console.WriteLine($"Authorization header received: {authHeader}");
+    await next();
+});
 app.UseAuthentication();
 app.UseAuthorization();
 
