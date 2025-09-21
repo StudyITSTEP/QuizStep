@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QuizStep.Core.Entities;
 
-public class Test
+public class Quiz
 {
     [Key]
     public int Id { get; set; }
@@ -15,7 +15,7 @@ public class Test
     [Required]
     public string? CreatorId { get; set; }
     public User Creator { get; set; }
-    public TestAccess? Access { get; set; }
-    public List<TestResult> TestsResults { get; set; } = null!;
+    public QuizAccess? Access { get; set; }
+    public List<QuizResult> TestsResults { get; set; } = null!;
     public List<Question> Questions { get; set; } = null!;
 }

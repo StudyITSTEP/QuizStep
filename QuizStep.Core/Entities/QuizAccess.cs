@@ -1,6 +1,6 @@
 namespace QuizStep.Core.Entities;
 
-public enum TestAccess
+public enum QuizAccess
 {
     Public,
     WithCodeIOnly

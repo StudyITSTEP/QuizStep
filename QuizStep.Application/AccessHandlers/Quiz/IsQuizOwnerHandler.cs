@@ -12,17 +12,17 @@ using System.Threading.Tasks;
 
 namespace QuizStep.Application.Handlers.Test
 {
-    public class IsTestOwnerHandler : AuthorizationHandler<IsTestOwnerRequirement, QuizStep.Core.Entities.Test> 
+    public class IsQuizOwnerHandler : AuthorizationHandler<IsQuizOwnerRequirement, QuizStep.Core.Entities.Quiz> 
     {
         private readonly IUser _user;
 
-        public IsTestOwnerHandler(IUser user)
+        public IsQuizOwnerHandler(IUser user)
         {
             _user = user;
         }
 
         protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context, IsTestOwnerRequirement requirement, QuizStep.Core.Entities.Test resource)
+            AuthorizationHandlerContext context, IsQuizOwnerRequirement requirement, QuizStep.Core.Entities.Quiz resource)
         {
             var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
 

@@ -9,33 +9,33 @@ using System.Threading.Tasks;
 
 namespace QuizStep.Infrastructure.Repositories
 {
-    public class TestRepository : ITest
+    public class QuizProviderRepository : IQuizProvider
     {
         private readonly ApplicationContext _context;
 
-        public TestRepository(ApplicationContext context)
+        public QuizProviderRepository(ApplicationContext context)
         {
             _context = context;
         }
 
-        public async Task<Test?> GetByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<Quiz?> GetByIdAsync(int id, CancellationToken cancellationToken)
             => await _context.Tests.FindAsync(new object[] { id }, cancellationToken);
 
-        public async Task AddAsync(Test test, CancellationToken cancellationToken)
+        public async Task AddAsync(Quiz quiz, CancellationToken cancellationToken)
         {
-            _context.Tests.Add(test);
+            _context.Tests.Add(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task UpdateAsync(Test test, CancellationToken cancellationToken)
+        public async Task UpdateAsync(Quiz quiz, CancellationToken cancellationToken)
         {
-            _context.Tests.Update(test);
+            _context.Tests.Update(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteAsync(Test test, CancellationToken cancellationToken)
+        public async Task DeleteAsync(Quiz quiz, CancellationToken cancellationToken)
         {
-            _context.Tests.Remove(test);
+            _context.Tests.Remove(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
