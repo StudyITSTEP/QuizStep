@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QuizStep.Core.Entities;
+using QuizStep.Core.Primitives;
 
 namespace QuizStep.Core.Interfaces;
 
@@ -17,6 +18,11 @@ public interface IUser
     Task<IdentityResult> AddToRoleAsync(User user, string role);
     Task<IdentityResult> AddToRolesAsync(User user, IEnumerable<string> roles);
     Task<IList<string>> GetRolesAsync(User user);
-
-    Task<bool> SignInAsync(User user, string password);
+    Task<Result> SignInAsync(User user, string password);
+    Task<string> GenerateEmailConfirmationTokenAsync(User user);
+    Task<Result> ConfirmEmailAsync(User user, string token);
+    Task<string?> GenerateRefreshTokenAsync(string userId, TimeSpan? expiration = null);
+    Task RevokeRefreshTokenAsync(int tokenId);
+    Task RevokeRefreshTokensAsync(string userId);
+    Task<string?> RenewRefreshTokenAsync(string userId, string refreshToken,TimeSpan? expiration = null);
 }
