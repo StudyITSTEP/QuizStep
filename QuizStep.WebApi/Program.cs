@@ -6,6 +6,7 @@ using QuizStep.Application.Interfaces;
 using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
 using QuizStep.Infrastructure.Data;
+using QuizStep.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddIdentityCore<User>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IAuthorizationHandler, IsTestOwnerHandler>();
+builder.Services.AddScoped<ITest, TestRepository>();
 
 builder.Services.AddDbContext<ApplicationContext>(opts =>
 opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

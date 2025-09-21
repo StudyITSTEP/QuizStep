@@ -12,7 +12,6 @@ namespace QuizStep.Application.Commands___Queries.Test
     public class UpdateTestCommand : IRequest<Unit>
     {
         public TestDto Test {  get; set; }
-
         public UpdateTestCommand(TestDto test) 
         {
             Test = test;

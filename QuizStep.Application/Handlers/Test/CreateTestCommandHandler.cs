@@ -2,6 +2,7 @@
 using MediatR;
 using QuizStep.Application.Commands___Queries.Test;
 using QuizStep.Application.Interfaces;
+using QuizStep.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,21 +14,19 @@ namespace QuizStep.Application.Handlers.Test
 {
     internal class CreateTestCommandHandler : IRequestHandler<CreateTestCommand, int>
     {
-        private readonly IApplicationDbContext _context;
+        private readonly ITest _testRepo;
         private readonly IMapper _mapper;
 
-        public CreateTestCommandHandler(IApplicationDbContext context, IMapper mapper)
+        public CreateTestCommandHandler(ITest testRepo, IMapper mapper)
         {
-            _context = context;
+            _testRepo = testRepo;
             _mapper = mapper;
         }
 
         public async Task<int> Handle(CreateTestCommand request, CancellationToken cancellationToken)
         {
             var test = _mapper.Map<QuizStep.Core.Entities.Test>(request.Test);
-
-            _context.Tests.Add(test);
-            await _context.SaveChangesAsync(cancellationToken);
+            await _testRepo.AddAsync(test, cancellationToken);
 
             return test.Id;
         }

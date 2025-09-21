@@ -8,7 +8,7 @@ using QuizStep.Core.Primitives;
 
 namespace QuizStep.Infrastructure.Data;
 
-public class ApplicationContext : IdentityDbContext<User>, IApplicationDbContext
+public class ApplicationContext : IdentityDbContext<User>
 {
     private readonly IPublisher _publisher;
 

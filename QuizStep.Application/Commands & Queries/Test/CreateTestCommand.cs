@@ -12,7 +12,6 @@ namespace QuizStep.Application.Commands___Queries.Test
     public class CreateTestCommand : IRequest<int>
     {
         public TestDto Test { get; set; }
-
         public CreateTestCommand(TestDto test) { Test = test; }
     }
 }
