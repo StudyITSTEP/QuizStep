@@ -9,12 +9,8 @@ using System.Threading.Tasks;
 
 namespace QuizStep.Application.Commands___Queries.Test
 {
-    public class UpdateTestCommand : IRequest<Unit>
+    public class UpdateTestCommand : IRequest<Result<TestDto>>
     {
-        public TestDto Test {  get; set; }
-        public UpdateTestCommand(TestDto test) 
-        {
-            Test = test;
-        }
+        public TestDto Test {  get; set; } = null!;
     }
 }

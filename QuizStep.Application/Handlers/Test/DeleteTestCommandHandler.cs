@@ -1,7 +1,9 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using QuizStep.Application.Commands___Queries.Test;
 using QuizStep.Application.Interfaces;
+using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace QuizStep.Application.Handlers.Test
 {
-    public class DeleteTestCommandHandler : IRequestHandler<DeleteTestCommand, Unit>
+    public class DeleteTestCommandHandler : IRequestHandler<DeleteTestCommand, Result<Unit>>
     {
         private readonly ITest _testRepo;
 
@@ -20,14 +22,15 @@ namespace QuizStep.Application.Handlers.Test
             _testRepo = testRepo;
         }
 
-        public async Task<Unit> Handle(DeleteTestCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Unit>> Handle(DeleteTestCommand request, CancellationToken cancellationToken)
         {
             var test = await _testRepo.GetByIdAsync(request.Id, cancellationToken);
 
             if (test == null)
-                throw new KeyNotFoundException($"Test with Id {request.Id} not found");
+                return Result<Unit>.Fail($"Test with Id {request.Id} not found");
+
             await _testRepo.DeleteAsync(test, cancellationToken);
-            return Unit.Value;
+            return Result<Unit>.Ok(Unit.Value);
         }
     }
 
