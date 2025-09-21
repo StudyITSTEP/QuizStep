@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using QuizStep.Application.Interfaces;
 using QuizStep.Core.Entities;
+using QuizStep.Core.Interfaces;
 using QuizStep.Core.Primitives;
 
 namespace QuizStep.Infrastructure.Data;
@@ -12,21 +13,29 @@ public class ApplicationContext : IdentityDbContext<User>
 {
     private readonly IPublisher _publisher;
 
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    
+    public DbSet<Test> Tests => Set<Test>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<User> Users => Set<User>();
+    
     public ApplicationContext(DbContextOptions<ApplicationContext> options, IPublisher publisher) : base(options)
     {
         _publisher = publisher;
     }
 
-    public DbSet<Test> Tests => Set<Test>();
-    public DbSet<Category> Categories => Set<Category>();
-    public DbSet<User> Users => Set<User>();
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+       
+        base.OnModelCreating(modelBuilder);
+    }
+
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        var events = ChangeTracker.Entries<Entity>()
-            .Select(e => e.Entity)
-            .Where(e => e.Events.Any())
-            .SelectMany(e => e.Events);
+        var events = ChangeTracker.Entries<IEntity>()
+            .Select(e => e.Entity).Where(e => e.GetEvents().Any()).ToList();
+
 
         var result = await base.SaveChangesAsync(cancellationToken);
 

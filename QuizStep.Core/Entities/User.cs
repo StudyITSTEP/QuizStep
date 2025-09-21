@@ -8,13 +8,14 @@ public class User: IdentityUser, IEntity
 {
     [NonSerialized]
     private readonly List<DomainEvent> _events = new List<DomainEvent>();
-    public ICollection<DomainEvent> Events => _events;
     
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    
+    public IEnumerable<RefreshToken> RefreshTokens { get; set; }
     public void Raise(DomainEvent e)
     {
         _events.Add(e);
     }
+
+    public IEnumerable<DomainEvent> GetEvents() => _events;
 }
