@@ -36,7 +36,7 @@ public class Result<TResult> : Result where TResult : class
     public static implicit operator bool(Result<TResult> result) => result.Succeeded;
 
     /// <summary>
-    /// Converting TResult object implicitly to Result object;
+    /// Converting Result<TResult> object implicitly to Result object;
     /// Before:
     ///         return Result<TResult>.Success(value);
     /// After:
