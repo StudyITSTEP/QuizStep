@@ -1,13 +1,24 @@
+
+using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+
+using QuizStep.Application.Handlers.Test;
+using QuizStep.Application.Interfaces;
+
+
+
 using Microsoft.IdentityModel.Tokens;
 using QuizStep.Application.Commands___Queries.User;
 using QuizStep.Application.Profiles;
 using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
 using QuizStep.Infrastructure.Config;
+
 using QuizStep.Infrastructure.Data;
 using QuizStep.Infrastructure.Repositories;
 
@@ -21,6 +32,9 @@ builder.Services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IAuthorizationHandler, IsTestOwnerHandler>();
+builder.Services.AddScoped<ITest, TestRepository>();
 
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IUser, UserRepository>();
@@ -67,10 +81,11 @@ builder.Services.AddAuthentication(opts =>
     });
 builder.Services.AddAuthorization();
 
+
 builder.Services.AddDbContext<ApplicationContext>(opts =>
-{
-    opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationContext>());
 
 var app = builder.Build();
 app.Use(async (context, next) =>
