@@ -1,4 +1,5 @@
 ﻿using QuizStep.Core.Entities;
+using QuizStep.Core.Enums;
 
 namespace QuizStep.Application.DTOs.Quiz
 {

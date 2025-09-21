@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using QuizStep.Core.Enums;
 
 namespace QuizStep.Core.Entities;
 

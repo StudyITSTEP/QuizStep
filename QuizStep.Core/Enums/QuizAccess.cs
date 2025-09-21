@@ -1,4 +1,4 @@
-namespace QuizStep.Core.Entities;
+namespace QuizStep.Core.Enums;
 
 public enum QuizAccess
 {
