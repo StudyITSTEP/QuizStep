@@ -15,7 +15,7 @@ public class ApplicationContext : IdentityDbContext<User>
 
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     
-    public DbSet<Test> Tests => Set<Test>();
+    public DbSet<Quiz> Tests => Set<Quiz>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<User> Users => Set<User>();
     

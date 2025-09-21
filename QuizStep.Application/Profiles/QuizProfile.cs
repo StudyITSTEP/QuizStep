@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using QuizStep.Application.DTOs.Test;
+using QuizStep.Application.DTOs.Quiz;
 using QuizStep.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace QuizStep.Application.Profiles
 {
-    public class TestProfile : Profile
+    public class QuizProfile : Profile
     {
-        public TestProfile()
+        public QuizProfile()
         {
-            CreateMap<TestDto, Test>().ReverseMap();
+            CreateMap<QuizDto, Quiz>().ReverseMap();
         }
     }
 }

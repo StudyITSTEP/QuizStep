@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuizStep.Application.AccessHandlers.Requrements
 {
-    public class IsTestOwnerRequirement : IAuthorizationRequirement
+    public class IsQuizOwnerRequirement : IAuthorizationRequirement
     {
 
     }

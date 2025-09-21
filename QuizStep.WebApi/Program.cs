@@ -33,8 +33,8 @@ builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<ApplicationContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddScoped<IAuthorizationHandler, IsTestOwnerHandler>();
-builder.Services.AddScoped<ITest, TestRepository>();
+builder.Services.AddScoped<IAuthorizationHandler, IsQuizOwnerHandler>();
+builder.Services.AddScoped<IQuizProvider, QuizProviderRepository>();
 
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IUser, UserRepository>();
@@ -85,7 +85,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<ApplicationContext>(opts =>
 opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationContext>());
+//builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationContext>());
 
 var app = builder.Build();
 app.Use(async (context, next) =>

@@ -10,7 +10,7 @@ namespace QuizStep.Application.Interfaces
 {
     public interface IApplicationDbContext
     {
-        DbSet<Test> Tests { get; }
+        DbSet<Quiz> Tests { get; }
         DbSet<Category> Categories { get; }
         DbSet<User> Users { get; }
 
