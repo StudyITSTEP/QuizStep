@@ -41,8 +41,8 @@ public class ApplicationContext : IdentityDbContext<User>
         var result = await base.SaveChangesAsync(cancellationToken);
 
         foreach (var e in events)
-        {
-            await _publisher.Publish(e, cancellationToken);
+        { 
+            _publisher.Publish(e, cancellationToken);
         }
 
         return result;

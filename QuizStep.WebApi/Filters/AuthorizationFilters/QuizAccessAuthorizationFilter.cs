@@ -5,24 +5,31 @@ using QuizStep.Core.Interfaces;
 
 namespace QuizStep.WebApi.Filters.AuthorizationFilters;
 
-public class QuizAccessAuthorizationFilter: Attribute,IAsyncAuthorizationFilter
+public class QuizAccessAuthorizationFilter : Attribute, IAsyncAuthorizationFilter
 {
-    private readonly IAuthorizationService _authorizationService;
-    private readonly IQuizProvider  _quizProvider;
-    public QuizAccessAuthorizationFilter(IAuthorizationService authorizationService, IQuizProvider quizProvider)
+    private readonly string _policyName;
+
+    public QuizAccessAuthorizationFilter(string policyName)
     {
-        _authorizationService = authorizationService;
-        _quizProvider = quizProvider;
+        _policyName = policyName;
     }
-    
+
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
+        var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
+        var quizProvider = context.HttpContext.RequestServices.GetService<IQuizProvider>();
+        if (quizProvider == null || authorizationService == null) return;
+
         int.TryParse(context.RouteData.Values["id"].ToString(), out int quizId);
-        if (quizId == 0) context.Result = new UnauthorizedObjectResult("Quiz id not provided");
+        int.TryParse(context.HttpContext.Request.Query["accessCode"].ToString(), out int accessCode);
         
-        var quiz = await _quizProvider.GetByIdAsync(quizId, new CancellationToken());
-        var authResult = await _authorizationService
-            .AuthorizeAsync(context.HttpContext.User, quiz, "QuizAccess");
+        if (quizId == 0) context.Result = new UnauthorizedObjectResult("Quiz id not provided");
+
+        var quiz = await quizProvider.GetByIdAsync(quizId, new CancellationToken());
+        if (quiz == null) return;
+        quiz.AccessCode = accessCode;
+        var authResult = await authorizationService
+            .AuthorizeAsync(context.HttpContext.User, quiz, _policyName);
 
         if (!authResult.Succeeded)
         {

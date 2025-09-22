@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using QuizStep.Core.Enums;
 using QuizStep.Core.Errors.General;
 using QuizStep.Core.Primitives;
 
@@ -32,12 +33,20 @@ namespace QuizStep.Infrastructure.Repositories
 
         public async Task AddAsync(Quiz quiz, CancellationToken cancellationToken)
         {
+            if (quiz.Access == QuizAccess.WithCodeIOnly)
+            {
+                quiz.AccessCode = new Random().Next(10000, 99999);
+            }
             _context.Quizzes.Add(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(Quiz quiz, CancellationToken cancellationToken)
         {
+            if (quiz.Access == QuizAccess.WithCodeIOnly)
+            {
+                quiz.AccessCode = new Random().Next(10000, 99999);
+            }
             _context.Quizzes.Update(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }
@@ -46,6 +55,12 @@ namespace QuizStep.Infrastructure.Repositories
         {
             _context.Quizzes.Remove(quiz);
             await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<int?> GetAccessCodeAsync(string userId, CancellationToken cancellationToken)
+        {
+            var quiz = await _context.Quizzes.FindAsync(new object[] { userId }, cancellationToken);
+            return quiz?.AccessCode;
         }
 
         public async Task<Question?> CreateQuestionAsync(Question question, CancellationToken cancellationToken)
