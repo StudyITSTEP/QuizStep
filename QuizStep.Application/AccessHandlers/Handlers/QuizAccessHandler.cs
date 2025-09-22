@@ -24,6 +24,7 @@ public class QuizAccessHandler : AuthorizationHandler<QuizAccessRequirement, Qui
 
         if (resource.CreatorId == user.Id
             || resource.Access == QuizAccess.Public
+            
            )
         {
             context.Succeed(requirement);
