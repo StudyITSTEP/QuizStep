@@ -1,16 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using QuizStep.Application.AccessHandlers.Requrements;
-using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace QuizStep.Application.Handlers.Test
+namespace QuizStep.Application.AccessHandlers.Handlers
 {
     public class IsQuizOwnerHandler : AuthorizationHandler<IsQuizOwnerRequirement, QuizStep.Core.Entities.Quiz> 
     {
