@@ -15,6 +15,7 @@ namespace QuizStep.Core.Interfaces
         Task AddAsync(Quiz quiz, CancellationToken cancellationToken);
         Task UpdateAsync(Quiz quiz, CancellationToken cancellationToken);
         Task DeleteAsync(Quiz quiz, CancellationToken cancellationToken);
+        Task<int?> GetAccessCodeAsync(string userId, CancellationToken cancellationToken);
         Task<Question?> CreateQuestionAsync(Question question, CancellationToken cancellationToken);
         Task<IEnumerable<Question>> GetQuestionsByQuizAsync(int quizId, CancellationToken cancellationToken);
         Task<Question?> GetQuestionByIdAsync(int questionId, CancellationToken cancellationToken);

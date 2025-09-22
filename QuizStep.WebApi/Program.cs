@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using QuizStep.Application.AccessHandlers.Requirements;
+using QuizStep.Application.AccessHandlers.Requrements;
 using QuizStep.Application.Commands___Queries.User;
 using QuizStep.Application.Profiles;
 using QuizStep.Core.Entities;
@@ -44,6 +45,7 @@ builder.Services.AddJwtAuthentication();
 builder.Services.AddAuthorization(opts =>
 {
     opts.AddPolicy("QuizAccess", policy => policy.AddRequirements(new QuizAccessRequirement()));
+    opts.AddPolicy("IsQuizOwner", policy => policy.AddRequirements(new IsQuizOwnerRequirement()));
 });
 
 

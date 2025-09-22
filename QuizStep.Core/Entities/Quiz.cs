@@ -17,6 +17,7 @@ public class Quiz
     public string? CreatorId { get; set; }
     public User Creator { get; set; }
     public QuizAccess? Access { get; set; }
+    public int? AccessCode { get; set; }
     public List<QuizResult> TestsResults { get; set; } = null!;
     public List<Question> Questions { get; set; } = null!;
 }

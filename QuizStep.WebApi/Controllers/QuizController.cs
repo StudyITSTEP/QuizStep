@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuizStep.Application.AccessHandlers.Requirements;
 using QuizStep.Application.Commands___Queries.Quiz;
@@ -7,6 +8,7 @@ using QuizStep.WebApi.Filters.AuthorizationFilters;
 namespace QuizStep.WebApi.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class QuizController : ControllerBase
 {
@@ -25,8 +27,8 @@ public class QuizController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [TypeFilter<QuizAccessAuthorizationFilter>]
-    public async Task<IActionResult> GetById(int id)
+    [QuizAccessAuthorizationFilter("QuizAccess")]
+    public async Task<IActionResult> GetById(int id, [FromBody] string? accessCode)
     {
         var result = await _mediator.Send(new GetByIdQuizQuery() { Id = id });
         if (!result) return NotFound();
@@ -41,7 +43,8 @@ public class QuizController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost]
+    [HttpPut]
+    [QuizAccessAuthorizationFilter("QuizOwner")]
     public async Task<IActionResult> Update([FromBody] UpdateQuizCommand command)
     {
         var result = await _mediator.Send(command);
@@ -50,6 +53,7 @@ public class QuizController : ControllerBase
     }
 
     [HttpPost("{id}")]
+    [QuizAccessAuthorizationFilter("QuizOwner")]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteQuizCommand() { Id = id });
