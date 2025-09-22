@@ -1,14 +1,7 @@
-
-using Microsoft.AspNetCore.Authorization;
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-
-using Microsoft.IdentityModel.Tokens;
-using QuizStep.Application.AccessHandlers.Handlers;
+using QuizStep.Application.AccessHandlers.Requirements;
 using QuizStep.Application.Commands___Queries.User;
 using QuizStep.Application.Profiles;
 using QuizStep.Core.Entities;
@@ -25,7 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-builder.Services.AddIdentityCore<User>()
+builder.Services
+    .AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationContext>()
     .AddDefaultTokenProviders();
@@ -47,7 +41,10 @@ var service = builder.Configuration.GetSection("EmailConfig").Get<EmailConfig>()
 builder.Services.AddSingleton(service);
 
 builder.Services.AddJwtAuthentication();
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(opts =>
+{
+    opts.AddPolicy("QuizAccess", policy => policy.AddRequirements(new QuizAccessRequirement()));
+});
 
 
 builder.Services.AddDbContext<ApplicationContext>(opts =>
