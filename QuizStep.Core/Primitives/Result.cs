@@ -32,7 +32,7 @@ public class Result<TResult> : Result where TResult : class
 
     public TResult? Value { get; }
     public static Result<TResult> Success(TResult value) => new(true, value, null);
-    public static Result<TResult> Failure(TResult value, Error error) => new(false, value, error);
+    public static Result<TResult> Failure(TResult? value, Error? error) => new(false, value, error);
     public static implicit operator bool(Result<TResult> result) => result.Succeeded;
 
     /// <summary>
@@ -44,7 +44,11 @@ public class Result<TResult> : Result where TResult : class
     /// </summary>
     /// <param name="result"></param>
     /// <returns>Result Success Result</returns>
-    public static implicit operator Result<TResult>(TResult result) => Result<TResult>.Success(result);
-    
-    public static implicit operator Result<TResult>(Error error) =>  Result<TResult>.Failure(null, error);
+    public static implicit operator Result<TResult>(TResult? result)
+    {
+        if (result != null) return Result<TResult>.Success(result);
+        return Result<TResult>.Failure(null, null);
+    }
+
+    public static implicit operator Result<TResult>(Error? error) => Result<TResult>.Failure(null, error);
 }
