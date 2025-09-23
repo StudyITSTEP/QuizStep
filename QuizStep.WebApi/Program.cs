@@ -31,6 +31,7 @@ builder.Services.AddScoped<IQuizProvider, QuizProviderRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IEmailSender, FakeEmailService>();
+builder.Services.AddScoped<ICategory, CategoryRepository>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
 builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile).Assembly);
