@@ -52,7 +52,7 @@ public class QuizController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("{id}")]
+    [HttpDelete("{id}")]
     [QuizAccessAuthorizationFilter("QuizOwner")]
     public async Task<IActionResult> Delete(int id)
     {

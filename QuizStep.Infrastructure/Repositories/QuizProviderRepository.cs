@@ -28,7 +28,6 @@ namespace QuizStep.Infrastructure.Repositories
         public async Task<IEnumerable<Quiz>> GetQuizzesAsync(CancellationToken cancellationToken)
         {
             return await _context.Quizzes.ToListAsync(cancellationToken);
-                
         }
 
         public async Task AddAsync(Quiz quiz, CancellationToken cancellationToken)
@@ -37,6 +36,7 @@ namespace QuizStep.Infrastructure.Repositories
             {
                 quiz.AccessCode = new Random().Next(10000, 99999);
             }
+
             _context.Quizzes.Add(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }
@@ -47,6 +47,7 @@ namespace QuizStep.Infrastructure.Repositories
             {
                 quiz.AccessCode = new Random().Next(10000, 99999);
             }
+
             _context.Quizzes.Update(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }
@@ -101,6 +102,26 @@ namespace QuizStep.Infrastructure.Repositories
             var q = _context.Questions.Update(question);
             await _context.SaveChangesAsync(cancellationToken);
             return q.Entity;
+        }
+
+        public async Task<QuizResult?> GetQuizResultAsync(string userId, int quizId,
+            CancellationToken cancellationToken)
+        {
+            return await _context.QuizResults
+                .FirstOrDefaultAsync(q => q.UserId == userId && q.QuizId == quizId,
+                    cancellationToken);
+        }
+
+        public async Task<Result> SetQuizResultAsync(QuizResult result, CancellationToken cancellationToken)
+        {
+            await _context.QuizResults.AddAsync(result, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
+
+        public async Task<IEnumerable<QuizResult>> GetQuizResultsByUserIdAsync(string userId, CancellationToken cancellationToken)
+        {
+            return await _context.QuizResults.Where(q => q.UserId == userId).ToListAsync(cancellationToken);
         }
     }
 }
