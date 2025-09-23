@@ -1,3 +1,5 @@
+using System.Security.Cryptography.Xml;
+
 namespace QuizStep.Core.Primitives;
 
 public class Result
@@ -23,7 +25,7 @@ public class Result
     public static implicit operator bool(Result result) => result.Succeeded;
 }
 
-public class Result<TResult> : Result where TResult : class
+public class Result<TResult> : Result
 {
     protected Result(bool succeeded, TResult? value, Error? error) : base(succeeded, error)
     {
@@ -47,8 +49,8 @@ public class Result<TResult> : Result where TResult : class
     public static implicit operator Result<TResult>(TResult? result)
     {
         if (result != null) return Result<TResult>.Success(result);
-        return Result<TResult>.Failure(null, null);
+        return Result<TResult>.Failure(default, null);
     }
 
-    public static implicit operator Result<TResult>(Error? error) => Result<TResult>.Failure(null, error);
+    public static implicit operator Result<TResult>(Error? error) => Result<TResult>.Failure(default, error);
 }
