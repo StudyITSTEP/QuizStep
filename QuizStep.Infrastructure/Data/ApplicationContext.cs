@@ -20,6 +20,7 @@ public class ApplicationContext : IdentityDbContext<User>
     public DbSet<QuizResult> QuizResults { get; set; }
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<QuestionAnswer> QuestionAnswers { get; set; }
+    public DbSet<Answer> Answers { get; set; }
     public DbSet<User> Users => Set<User>();
     
     public ApplicationContext(DbContextOptions<ApplicationContext> options, IPublisher publisher) : base(options)

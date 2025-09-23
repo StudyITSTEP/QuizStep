@@ -14,5 +14,6 @@ namespace QuizStep.Core.Interfaces
         Task AddAsync(Answer answer, CancellationToken cancellationToken = default);
         Task UpdateAsync(Answer answer, CancellationToken cancellationToken = default);
         Task DeleteAsync(Answer answer, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Answer>> GetByQuestionIdAsync(int questionId, CancellationToken cancellationToken);
     }
 }

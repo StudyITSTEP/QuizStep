@@ -50,5 +50,13 @@ namespace QuizStep.Infrastructure.Repositories
             _context.Set<Answer>().Update(answer);
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<IEnumerable<Answer>> GetByQuestionIdAsync(int questionId, CancellationToken cancellationToken)
+        {
+            return await _context.Answers
+                .Where(a => a.Questions.Any(q => q.Id == questionId))
+                .ToListAsync(cancellationToken);
+        }
+
     }
 }

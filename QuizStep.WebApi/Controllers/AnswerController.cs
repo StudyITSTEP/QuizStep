@@ -61,5 +61,14 @@ namespace QuizStep.WebApi.Controllers
             if (!result) return BadRequest(result.Error);
             return Ok(result);
         }
+
+        [HttpGet("by-question/{questionId}")]
+        public async Task<IActionResult> GetByQuestionId(int questionId)
+        {
+            var result = await _mediator.Send(new GetAnswersByQuestionIdQuery(questionId));
+
+            if (!result) return NotFound(result.Error);
+            return Ok(result.Value);
+        }
     }
 }
