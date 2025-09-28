@@ -12,5 +12,5 @@ public class UpdateQuestionCommand: IRequest<Result<QuestionDto>>
     [Required]
     public string Text { get; set; } = null!;
     [Required]
-    public List<Answer> Answers { get; set; } = null!;
+    public List<Core.Entities.Answer> Answers { get; set; } = null!;
 }
