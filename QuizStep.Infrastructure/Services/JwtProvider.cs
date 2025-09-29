@@ -17,6 +17,8 @@ public class JwtProvider: IJwtProvider
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+            new Claim("firstName", user.FirstName!),
+            new Claim("lastName", user.LastName!),
         };
         
         var jwt = new JwtSecurityToken(
