@@ -8,7 +8,6 @@ using QuizStep.Application.Profiles;
 using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
 using QuizStep.Infrastructure.Config;
-
 using QuizStep.Infrastructure.Data;
 using QuizStep.Infrastructure.Repositories;
 using QuizStep.WebApi.Extentions;
@@ -49,13 +48,24 @@ builder.Services.AddAuthorization(opts =>
     opts.AddPolicy("IsQuizOwner", policy => policy.AddRequirements(new IsQuizOwnerRequirement()));
 });
 
+builder.Services.AddCors(opts =>
+{
+    opts.AddPolicy("AllowReactFront", policy =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        }
+    });
+});
 
 builder.Services.AddDbContext<ApplicationContext>(opts =>
-opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationContext>());
 
 var app = builder.Build();
+app.UseCors("AllowReactFront");
 app.Use(async (context, next) =>
 {
     var authHeader = context.Request.Headers["Authorization"].ToString();
