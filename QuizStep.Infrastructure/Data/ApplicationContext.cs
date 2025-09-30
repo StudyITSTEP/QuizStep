@@ -24,6 +24,7 @@ public class ApplicationContext : IdentityDbContext<User>
     public ApplicationContext(DbContextOptions<ApplicationContext> options, IPublisher publisher) : base(options)
     {
         _publisher = publisher;
+        Database.Migrate();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

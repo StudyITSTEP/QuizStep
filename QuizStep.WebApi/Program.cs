@@ -27,13 +27,13 @@ builder.Services
 builder.Services.AddAuthorizationHandlers();
 builder.Services.AddScoped<IQuizProvider, QuizProviderRepository>();
 
-builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IEmailSender, FakeEmailService>();
 builder.Services.AddScoped<ICategory, CategoryRepository>();
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
-builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile).Assembly);
+builder.Services.AddAutoMapper(cfg => { cfg.AllowNullCollections = true; }, typeof(UserProfile).Assembly);
 
 builder.Services.AddHttpContextAccessor();
 
@@ -65,13 +65,17 @@ builder.Services.AddDbContext<ApplicationContext>(opts =>
 //builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationContext>());
 
 var app = builder.Build();
-app.UseCors("AllowReactFront");
-app.Use(async (context, next) =>
+
+using (var scope = app.Services.CreateScope())
 {
-    var authHeader = context.Request.Headers["Authorization"].ToString();
-    Console.WriteLine($"Authorization header received: {authHeader}");
-    await next();
-});
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await InitData.Initialize(context,userManager, roleManager);
+}
+
+app.UseCors("AllowReactFront");
+
 app.UseAuthentication();
 app.UseAuthorization();
 

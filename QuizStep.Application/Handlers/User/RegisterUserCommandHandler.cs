@@ -38,6 +38,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
 
         if (result.Succeeded)
         {
+            await  _user.AddToRoleAsync(user, "User");
             dto.Result = Result.Success();
             var confirmToken = await _user.GenerateEmailConfirmationTokenAsync(user);
             var uriBuilder = new UriBuilder(request.ConfirmationLink);
