@@ -25,6 +25,11 @@ namespace QuizStep.Infrastructure.Repositories
         public async Task<Quiz?> GetByIdAsync(int id, CancellationToken cancellationToken)
             => await _context.Quizzes.FindAsync(new object[] { id }, cancellationToken);
 
+        public async Task<IEnumerable<Quiz>> GetByUserAsync(string userId, CancellationToken cancellationToken)
+        {
+            return await _context.Quizzes.Where(q => q.CreatorId == userId).ToListAsync();
+        }
+
         public async Task<IEnumerable<Quiz>> GetQuizzesAsync(CancellationToken cancellationToken)
         {
             return await _context.Quizzes.ToListAsync(cancellationToken);
@@ -37,6 +42,16 @@ namespace QuizStep.Infrastructure.Repositories
                 quiz.AccessCode = new Random().Next(10000, 99999);
             }
 
+            var index = 0;
+            foreach (var q in quiz.Questions)
+            {
+                _context.QuestionAnswers.Add(new QuestionAnswer
+                {
+                    Question = q,
+                    Answer = q.Answers[index],
+                    IsCorrect = q.CorrectAnswerIndex == index++
+                });
+            }
             _context.Quizzes.Add(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }
@@ -119,7 +134,8 @@ namespace QuizStep.Infrastructure.Repositories
             return Result.Success();
         }
 
-        public async Task<IEnumerable<QuizResult>> GetQuizResultsByUserIdAsync(string userId, CancellationToken cancellationToken)
+        public async Task<IEnumerable<QuizResult>> GetQuizResultsByUserIdAsync(string userId,
+            CancellationToken cancellationToken)
         {
             return await _context.QuizResults.Where(q => q.UserId == userId).ToListAsync(cancellationToken);
         }
