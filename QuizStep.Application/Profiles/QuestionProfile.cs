@@ -11,7 +11,8 @@ public class QuestionProfile: Profile
     {
         CreateMap<Question, CreateQuestionCommand>().ReverseMap();
         CreateMap<Question, UpdateQuestionCommand>().ReverseMap();
-        CreateMap<QuestionDto, Question>().ReverseMap();
-        CreateMap<IEnumerable<QuestionDto>, IEnumerable<Question>>().ReverseMap();
+        CreateMap<QuestionDto, Question>()
+            .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers))
+            .ReverseMap();
     }
 }

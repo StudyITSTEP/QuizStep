@@ -36,7 +36,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Login(LoginUserCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.Result!) return Unauthorized(result);
+        if (!result) return Unauthorized(result);
         return Ok(result);
     }
 

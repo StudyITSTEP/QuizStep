@@ -9,7 +9,8 @@ namespace QuizStep.Application.DTOs.Quiz
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public int CategoryId { get; set; }
-        public int CreatorId { get; set; }
+        public string CreatorId { get; set; }
+        public IEnumerable<QuestionDto>  Questions { get; set; } = null!;
         public QuizAccess QuizAccess { get; set; }
     }
 }

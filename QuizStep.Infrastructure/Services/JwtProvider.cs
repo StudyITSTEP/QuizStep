@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
@@ -10,15 +11,25 @@ namespace QuizStep.Infrastructure.Repositories;
 public class JwtProvider: IJwtProvider
 {
     private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
-    
+    private readonly UserManager<User> _user;
+    public JwtProvider(UserManager<User> user)
+    {
+        _user = user;
+    }
     public string GetJwt(User user)
     {
+        var roles = _user.GetRolesAsync(user).Result;
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+            new Claim("firstName", user.FirstName!),
+            new Claim("lastName", user.LastName!),
         };
-        
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim("roles", role));
+        }
         var jwt = new JwtSecurityToken(
             issuer: JwtConfig.ISSUER,
             audience: JwtConfig.AUDIENCE,

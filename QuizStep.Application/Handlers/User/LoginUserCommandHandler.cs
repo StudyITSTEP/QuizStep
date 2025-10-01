@@ -8,7 +8,7 @@ using QuizStep.Core.Primitives;
 
 namespace QuizStep.Application.Handlers.User;
 
-public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginResultDto>
+public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<LoginResultDto>>
 {
     private readonly IUser _user;
     private readonly IMapper _mapper;
@@ -19,7 +19,7 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginRe
         _mapper = mapper;
     }
 
-    public async Task<LoginResultDto> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LoginResultDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _user.GetUserByEmailAsync(request.Email);
         var result = await _user.CheckPasswordAsync(user, request.Password!);
@@ -30,11 +30,10 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginRe
             var refreshToken = await _user.GenerateRefreshTokenAsync(user.Id);
             dto.Token = token;
             dto.RefreshToken = refreshToken!;
-            dto.Result = Result.Success();
         }
         else
         {
-            dto.Result = LoginError.UserOrPassword;
+            return LoginError.UserOrPassword;
         }
 
         return dto;

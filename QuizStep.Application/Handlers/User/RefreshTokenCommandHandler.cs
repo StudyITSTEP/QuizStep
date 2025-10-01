@@ -22,19 +22,10 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
     public async Task<RefreshTokenDto?> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var user = await _user.GetUserByIdAsync(request.UserId);
-        if (user == null)
-        {
-            return null;
-        }
-
         var newToken = await _user.RenewRefreshTokenAsync(user.Id, request.RefreshToken, TimeSpan.FromDays(7));
-        if (newToken == null)
-        {
-            return null;
-        }
-
+        if (newToken == null) return null;
         var token = _jwtProvider.GetJwt(user);
-
+        
         return new RefreshTokenDto
         {
             AccessToken = token,

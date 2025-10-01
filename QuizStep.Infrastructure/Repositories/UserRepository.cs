@@ -120,7 +120,15 @@ public class UserRepository : IUser
                 if (TokenHasher.VerifyToken(refreshToken, r.Salt, r.Hash))
                 {
                     validToken = true;
-                    await RevokeRefreshTokenAsync(r.Id);
+                    try
+                    {
+                        await RevokeRefreshTokenAsync(r.Id);
+
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                     break;
                 }
             }

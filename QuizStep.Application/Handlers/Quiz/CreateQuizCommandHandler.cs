@@ -20,7 +20,7 @@ namespace QuizStep.Application.Handlers.Quiz
 
         public async Task<Result<QuizDto>> Handle(CreateQuizCommand request, CancellationToken cancellationToken)
         {
-            var test = _mapper.Map<QuizStep.Core.Entities.Quiz>(request.Test);
+            var test = _mapper.Map<QuizStep.Core.Entities.Quiz>(request.Quiz);
             await _quizProviderRepo.AddAsync(test, cancellationToken);
             var dto = _mapper.Map<QuizDto>(test);
             return dto;

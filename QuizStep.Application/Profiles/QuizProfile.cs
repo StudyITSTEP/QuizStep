@@ -13,7 +13,9 @@ namespace QuizStep.Application.Profiles
     {
         public QuizProfile()
         {
-            CreateMap<QuizDto, Quiz>().ReverseMap();
+            CreateMap<QuizDto, Quiz>()
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions))
+                .ReverseMap();
         }
     }
 }

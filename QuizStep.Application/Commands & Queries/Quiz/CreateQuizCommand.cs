@@ -6,6 +6,6 @@ namespace QuizStep.Application.Commands___Queries.Quiz
 {
     public class CreateQuizCommand : IRequest<Result<QuizDto>>
     {
-        public QuizDto Test { get; set; } = null!;
+        public QuizDto Quiz { get; set; } = null!;
     }
 }

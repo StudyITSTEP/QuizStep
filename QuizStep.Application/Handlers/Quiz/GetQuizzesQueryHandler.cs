@@ -7,7 +7,7 @@ using QuizStep.Core.Interfaces;
 
 namespace QuizStep.Application.Handlers.Quiz;
 
-public class GetQuizzesQueryHandler : IRequestHandler<GetQuizzesQuery, IEnumerable<QuestionDto>>
+public class GetQuizzesQueryHandler : IRequestHandler<GetQuizzesQuery, IEnumerable<QuizDto>>
 {
     private readonly IUser _user;
     private readonly IMapper _mapper;
@@ -20,7 +20,7 @@ public class GetQuizzesQueryHandler : IRequestHandler<GetQuizzesQuery, IEnumerab
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<QuestionDto>> Handle(GetQuizzesQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<QuizDto>> Handle(GetQuizzesQuery request, CancellationToken cancellationToken)
     {
         var user = await _user.GetUserAsync();
         var quizzes = await _quizProvider.GetQuizzesAsync(cancellationToken);
@@ -28,6 +28,6 @@ public class GetQuizzesQueryHandler : IRequestHandler<GetQuizzesQuery, IEnumerab
             .Where(q => q.CreatorId == user.Id
                              || q.Access == QuizAccess.Public);
         
-        return _mapper.Map<IEnumerable<QuestionDto>>(result);
+        return _mapper.Map<IEnumerable<QuizDto>>(result);
     }
 }
