@@ -23,7 +23,13 @@ namespace QuizStep.Infrastructure.Repositories
         }
 
         public async Task<Quiz?> GetByIdAsync(int id, CancellationToken cancellationToken)
-            => await _context.Quizzes.FindAsync(new object[] { id }, cancellationToken);
+        {
+            return await _context.Quizzes
+                .Include(q => q.Questions)
+                .ThenInclude(q => q.Answers)
+                .FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
+        }
+
 
         public async Task<IEnumerable<Quiz>> GetByUserAsync(string userId, CancellationToken cancellationToken)
         {
@@ -52,6 +58,7 @@ namespace QuizStep.Infrastructure.Repositories
                     IsCorrect = q.CorrectAnswerIndex == index++
                 });
             }
+
             _context.Quizzes.Add(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }

@@ -11,6 +11,7 @@ namespace QuizStep.Core.Interfaces
     public interface IQuizProvider
     {
         Task<Quiz?> GetByIdAsync(int id, CancellationToken cancellationToken);
+        Task<IEnumerable<Quiz>> GetByUserAsync(string userId, CancellationToken cancellationToken);
         Task<IEnumerable<Quiz>> GetQuizzesAsync(CancellationToken cancellationToken);
         Task AddAsync(Quiz quiz, CancellationToken cancellationToken);
         Task UpdateAsync(Quiz quiz, CancellationToken cancellationToken);

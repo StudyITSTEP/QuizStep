@@ -25,7 +25,14 @@ public class QuizController : ControllerBase
         var result = await _mediator.Send(new GetQuizzesQuery());
         return Ok(result);
     }
-
+    
+    [HttpGet("my/{userId}")]
+    public async Task<IActionResult> GetAll(string userId)
+    {
+        var result = await _mediator.Send(new GetUserQuizzesQuery(userId));
+        return Ok(result);
+    }
+    
     [HttpGet("{id}")]
     [QuizAccessAuthorizationFilter("QuizAccess")]
     public async Task<IActionResult> GetById(int id, [FromBody] string? accessCode)

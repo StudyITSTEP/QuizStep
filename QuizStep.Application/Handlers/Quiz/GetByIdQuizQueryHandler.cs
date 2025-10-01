@@ -24,7 +24,7 @@ namespace QuizStep.Application.Handlers.Quiz
             var test = await _quizProviderRepo.GetByIdAsync(request.Id, cancellationToken);
             if (test == null)
                 return QueryError.EntityNotExist;
-
+            
             return _mapper.Map<QuizDto>(test);
         }
     }
