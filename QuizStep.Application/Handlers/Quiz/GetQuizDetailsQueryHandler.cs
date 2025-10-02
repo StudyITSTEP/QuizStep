@@ -34,6 +34,5 @@ public class GetQuizDetailsQueryHandler: IRequestHandler<GetQuizDetailsQuery, Re
         dto.CreatorEmail = creator.Email;
         dto.TotalQuestions = quiz.Questions.Count;
         return dto;
-        
     }
 }

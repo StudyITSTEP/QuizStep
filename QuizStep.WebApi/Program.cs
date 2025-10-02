@@ -8,6 +8,7 @@ using QuizStep.Application.Profiles;
 using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
 using QuizStep.Infrastructure.Config;
+
 using QuizStep.Infrastructure.Data;
 using QuizStep.Infrastructure.Repositories;
 using QuizStep.WebApi.Extentions;
@@ -27,13 +28,13 @@ builder.Services
 builder.Services.AddAuthorizationHandlers();
 builder.Services.AddScoped<IQuizProvider, QuizProviderRepository>();
 
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IEmailSender, FakeEmailService>();
 builder.Services.AddScoped<ICategory, CategoryRepository>();
-builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
-builder.Services.AddAutoMapper(cfg => { cfg.AllowNullCollections = true; }, typeof(UserProfile).Assembly);
+builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile).Assembly);
 
 builder.Services.AddHttpContextAccessor();
 
@@ -48,34 +49,19 @@ builder.Services.AddAuthorization(opts =>
     opts.AddPolicy("IsQuizOwner", policy => policy.AddRequirements(new IsQuizOwnerRequirement()));
 });
 
-builder.Services.AddCors(opts =>
-{
-    opts.AddPolicy("AllowReactFront", policy =>
-    {
-        if (builder.Environment.IsDevelopment())
-        {
-            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-        }
-    });
-});
 
 builder.Services.AddDbContext<ApplicationContext>(opts =>
-    opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationContext>());
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
+app.Use(async (context, next) =>
 {
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await InitData.Initialize(context,userManager, roleManager);
-}
-
-app.UseCors("AllowReactFront");
-
+    var authHeader = context.Request.Headers["Authorization"].ToString();
+    Console.WriteLine($"Authorization header received: {authHeader}");
+    await next();
+});
 app.UseAuthentication();
 app.UseAuthorization();
 
