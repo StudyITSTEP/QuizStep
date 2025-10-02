@@ -4,6 +4,7 @@ using QuizStep.Infrastructure.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -45,23 +46,31 @@ namespace QuizStep.Infrastructure.Repositories
         {
             if (quiz.Access == QuizAccess.WithCodeIOnly)
             {
-                quiz.AccessCode = new Random().Next(10000, 99999);
+                quiz.AccessCode = RandomNumberGenerator.GetInt32(10000, 99999);
             }
 
-            var index = 0;
+            _context.Quizzes.Add(quiz); // ✅ Only this
+            await _context.SaveChangesAsync(cancellationToken);
             foreach (var q in quiz.Questions)
             {
-                _context.QuestionAnswers.Add(new QuestionAnswer
+                var index = 0;
+                foreach (var answer in q.Answers) // or Id if set
                 {
-                    Question = q,
-                    Answer = q.Answers[index],
-                    IsCorrect = q.CorrectAnswerIndex == index++
-                });
+                    if (index == q.CorrectAnswerIndex)
+                    {
+                        var res = _context.QuestionAnswers
+                            .FirstOrDefault(qa => qa.QuestionId == q.Id && qa.AnswerId == answer.Id);
+                        res.IsCorrect = true;
+                        _context.QuestionAnswers.Update(res);
+                    }
+
+                    index++;
+                }
             }
 
-            _context.Quizzes.Add(quiz);
             await _context.SaveChangesAsync(cancellationToken);
         }
+
 
         public async Task UpdateAsync(Quiz quiz, CancellationToken cancellationToken)
         {
@@ -136,7 +145,18 @@ namespace QuizStep.Infrastructure.Repositories
 
         public async Task<Result> SetQuizResultAsync(QuizResult result, CancellationToken cancellationToken)
         {
-            await _context.QuizResults.AddAsync(result, cancellationToken);
+            var qr = await _context.QuizResults
+                .FirstOrDefaultAsync(
+                    r => r.QuizId == result.QuizId && r.UserId == result.UserId, cancellationToken);
+            if (qr != null)
+            {
+                qr.Score = result.Score;
+            }
+            else
+            {
+                await _context.QuizResults.AddAsync(result, cancellationToken);
+            }
+
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
@@ -145,6 +165,25 @@ namespace QuizStep.Infrastructure.Repositories
             CancellationToken cancellationToken)
         {
             return await _context.QuizResults.Where(q => q.UserId == userId).ToListAsync(cancellationToken);
+        }
+
+        public async Task<decimal> ResolveScoreAsync(int quizId, Dictionary<int, int> answers,
+            CancellationToken cancellationToken)
+        {
+            var correctCount = 0;
+            var totalQuestions = _context.Questions.Count(q => q.QuizId == quizId);
+            foreach (var answer in answers)
+            {
+                var correct = await _context.QuestionAnswers
+                    .FirstOrDefaultAsync(q => q.Question.Id == answer.Key && q.IsCorrect, cancellationToken);
+                if (correct != null && correct.AnswerId == answer.Value)
+                {
+                    correctCount++;
+                }
+            }
+
+            var result = (correctCount * 100) / (decimal)totalQuestions;
+            return result;
         }
     }
 }

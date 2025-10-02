@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuizStep.Infrastructure.Data;
@@ -11,9 +12,11 @@ using QuizStep.Infrastructure.Data;
 namespace QuizStep.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20251001182139_AnswerAdded")]
+    partial class AnswerAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,7 +156,6 @@ namespace QuizStep.Infrastructure.Migrations
 
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
-
 
             modelBuilder.Entity("QuizStep.Core.Entities.Answer", b =>
                 {
@@ -300,7 +302,6 @@ namespace QuizStep.Infrastructure.Migrations
 
                     b.ToTable("QuizResults");
                 });
-
 
             modelBuilder.Entity("QuizStep.Core.Entities.RefreshToken", b =>
                 {
@@ -455,6 +456,74 @@ namespace QuizStep.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("QuizStep.Core.Entities.Question", b =>
+                {
+                    b.HasOne("QuizStep.Core.Entities.Quiz", "Quiz")
+                        .WithMany("Questions")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("QuizStep.Core.Entities.QuestionAnswer", b =>
+                {
+                    b.HasOne("QuizStep.Core.Entities.Answer", "Answer")
+                        .WithMany()
+                        .HasForeignKey("AnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizStep.Core.Entities.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Answer");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("QuizStep.Core.Entities.Quiz", b =>
+                {
+                    b.HasOne("QuizStep.Core.Entities.Category", "Category")
+                        .WithMany("Quizzes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizStep.Core.Entities.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("QuizStep.Core.Entities.QuizResult", b =>
+                {
+                    b.HasOne("QuizStep.Core.Entities.Quiz", "Quiz")
+                        .WithMany("TestsResults")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizStep.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quiz");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("QuizStep.Core.Entities.RefreshToken", b =>
                 {
                     b.HasOne("QuizStep.Core.Entities.User", "User")
@@ -464,6 +533,18 @@ namespace QuizStep.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("QuizStep.Core.Entities.Category", b =>
+                {
+                    b.Navigation("Quizzes");
+                });
+
+            modelBuilder.Entity("QuizStep.Core.Entities.Quiz", b =>
+                {
+                    b.Navigation("Questions");
+
+                    b.Navigation("TestsResults");
                 });
 
             modelBuilder.Entity("QuizStep.Core.Entities.User", b =>
