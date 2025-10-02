@@ -11,6 +11,7 @@ using QuizStep.Infrastructure.Config;
 using QuizStep.Infrastructure.Data;
 using QuizStep.Infrastructure.Repositories;
 using QuizStep.WebApi.Extentions;
+using QuizStep.WebApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ builder.Services.AddScoped<ICategory, CategoryRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IQuizResultProvider, QuizResultProvider>();
 
+builder.Services.AddSignalR();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
 builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile).Assembly);
 
@@ -73,6 +75,9 @@ app.Use(async (context, next) =>
     Console.WriteLine($"Authorization header received: {authHeader}");
     await next();
 });
+
+app.MapHub<QuizHub>("/quizHub");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
