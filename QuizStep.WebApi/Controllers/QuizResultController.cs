@@ -33,10 +33,10 @@ public class QuizResultController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{userId}")]
+    [HttpGet("results/{userId}")]
     public async Task<IActionResult> GetQuizResultsByUserId(string userId)
     {
-        var result = await _mediator.Send(new GetQuizResultByUserIdQuery(userId));
+        var result = await _mediator.Send(new GetQuizResultsByUserIdQuery(userId));
         if (result.Value == null) return NotFound();
         return Ok(result.Value);
     }

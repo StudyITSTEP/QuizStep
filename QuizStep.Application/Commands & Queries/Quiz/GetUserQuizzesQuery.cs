@@ -4,4 +4,4 @@ using QuizStep.Core.Primitives;
 
 namespace QuizStep.Application.Commands___Queries.Quiz;
 
-public record GetUserQuizzesQuery(string userId) : IRequest<IEnumerable<QuizDto>>;
+public record GetUserQuizzesQuery(string userId) : IRequest<IEnumerable<QuizDetailsDto>>;
