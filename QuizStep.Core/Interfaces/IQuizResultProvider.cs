@@ -1,6 +1,9 @@
+using QuizStep.Core.Primitives;
+
 namespace QuizStep.Core.Interfaces;
 
-public class IQuizResultProvider
+public interface IQuizResultProvider
 {
-    
+    public Task<Result<int>> GetTotalParticipantsAsync(int quizId);
+    public Task<Result<decimal>> GetAverageScoreByQuizAsync(int quizId);
 }

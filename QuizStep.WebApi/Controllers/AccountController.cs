@@ -45,7 +45,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> ConfirmEmail(string? token, string? email)
     {
         var result = await _mediator.Send(new ConfirmEmailCommand(token, email));
-        return Ok(result);
+        return RedirectPermanent("http://localhost:5173/login");
     }
 
     [HttpPost]

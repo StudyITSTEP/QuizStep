@@ -21,58 +21,43 @@ public class QuizAccessAuthorizationFilter : Attribute, IAsyncAuthorizationFilte
         var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
         if (authorizationService == null) return;
 
-        int quizId = 0;
-        int accessCode = 0;
-
-        // 1. Try getting id from route data
-        if (context.RouteData.Values.TryGetValue("id", out var idValue) &&
-            int.TryParse(idValue?.ToString(), out var routeId))
+        var request = context.HttpContext.Request;
+        string? code = null;
+        int quizId = -1;
+        try
         {
-            quizId = routeId;
+            // For JSON body
+            request.EnableBuffering();
+            using var reader = new StreamReader(request.Body, leaveOpen: true);
+            var body = await reader.ReadToEndAsync();
+            request.Body.Position = 0; // reset for later
+
+            // Now you can parse JSON if needed
+            var json = JsonDocument.Parse(body);
+
+            quizId = json.RootElement.GetProperty("id").GetInt32();
+            code = json.RootElement.GetProperty("accessCode").GetString();
+        }
+        catch (Exception)
+        {
         }
 
-        // 2. Enable buffering and read request body as JSON
-        context.HttpContext.Request.EnableBuffering();
-        using (var reader = new StreamReader(context.HttpContext.Request.Body, leaveOpen: true))
+        int accessCode = -1;
+        if (!string.IsNullOrEmpty(code))
         {
-            var bodyString = await reader.ReadToEndAsync();
-            context.HttpContext.Request.Body.Position = 0; // reset stream
-
-            if (!string.IsNullOrWhiteSpace(bodyString))
-            {
-                try
-                {
-                    var bodyJson = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(bodyString);
-
-                    if (quizId == 0 && bodyJson != null && bodyJson.TryGetValue("id", out var bodyId))
-                    {
-                        if (bodyId.TryGetInt32(out var parsedId))
-                            quizId = parsedId;
-                    }
-
-                    if (bodyJson != null && bodyJson.TryGetValue("accessCode", out var bodyAccess))
-                    {
-                        if (bodyAccess.TryGetInt32(out var parsedAccess))
-                            accessCode = parsedAccess;
-                    }
-                }
-                catch (JsonException)
-                {
-                    context.Result = new BadRequestObjectResult("Invalid request body");
-                    return;
-                }
-            }
+            int.TryParse(code, out accessCode);
         }
 
-        // 3. Validate quizId
-        if (quizId == 0)
+        if (quizId == -1)
         {
-            context.Result = new UnauthorizedObjectResult("Quiz id not provided");
-            return;
+            int.TryParse(context.RouteData.Values["id"].ToString(), out quizId);
         }
+        
+        if (quizId == -1) context.Result = new UnauthorizedObjectResult("Quiz id not provided");
 
-        var quiz = new Quiz() {Id = quizId, AccessCode = accessCode};
+        var quiz = new Quiz() { Id = quizId, AccessCode = accessCode };
 
+        quiz.AccessCode = accessCode;
         var authResult = await authorizationService
             .AuthorizeAsync(context.HttpContext.User, quiz, _policyName);
 

@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services
-    .AddIdentityCore<User>()
+    .AddIdentityCore<User>(opts => opts.SignIn.RequireConfirmedEmail = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationContext>()
     .AddDefaultTokenProviders();
@@ -34,6 +34,8 @@ builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IEmailSender, FakeEmailService>();
 builder.Services.AddScoped<ICategory, CategoryRepository>();
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<IQuizResultProvider, QuizResultProvider>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
 builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile).Assembly);

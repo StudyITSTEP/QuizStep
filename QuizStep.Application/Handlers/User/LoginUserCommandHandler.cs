@@ -22,7 +22,8 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
     public async Task<Result<LoginResultDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _user.GetUserByEmailAsync(request.Email);
-        var result = await _user.CheckPasswordAsync(user, request.Password!);
+        if (user == null) return LoginError.UserOrPassword;
+        var result = await _user.SignInAsync(user, request.Password!);
         LoginResultDto dto = new();
         if (result)
         {
@@ -33,7 +34,7 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
         }
         else
         {
-            return LoginError.UserOrPassword;
+            return result.Error;
         }
 
         return dto;
