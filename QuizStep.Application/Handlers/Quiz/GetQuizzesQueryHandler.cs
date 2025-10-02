@@ -7,27 +7,33 @@ using QuizStep.Core.Interfaces;
 
 namespace QuizStep.Application.Handlers.Quiz;
 
-public class GetQuizzesQueryHandler : IRequestHandler<GetQuizzesQuery, IEnumerable<QuizDto>>
+public class GetQuizzesQueryHandler : IRequestHandler<GetQuizzesQuery, IEnumerable<QuizDetailsDto>>
 {
-    private readonly IUser _user;
     private readonly IMapper _mapper;
+    private readonly IMediator _mediator;
     private readonly IQuizProvider _quizProvider;
 
-    public GetQuizzesQueryHandler(IUser user, IQuizProvider quizProvider, IMapper mapper)
+    public GetQuizzesQueryHandler(IUser user, IQuizProvider quizProvider, IMapper mapper,  IMediator mediator)
     {
-        _user = user;
         _quizProvider = quizProvider;
         _mapper = mapper;
+        _mediator = mediator;
     }
 
-    public async Task<IEnumerable<QuizDto>> Handle(GetQuizzesQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<QuizDetailsDto>> Handle(GetQuizzesQuery request, CancellationToken cancellationToken)
     {
-        var user = await _user.GetUserAsync();
-        var quizzes = await _quizProvider.GetQuizzesAsync(cancellationToken);
-        // var result = quizzes
-        //     .Where(q => q.CreatorId == user.Id
-        //                      || q.Access == QuizAccess.Public);
-        
-        return _mapper.Map<IEnumerable<QuizDto>>(quizzes);
+        var result = await _quizProvider.GetQuizzesAsync( cancellationToken);
+        var dto = new List<QuizDetailsDto>();
+        foreach (var r in result)
+        {
+            var details = await _mediator.Send(new GetQuizDetailsQuery(r.Id), cancellationToken);
+            if (details && details.Value != null)
+            {
+                var q = details.Value;
+                dto.Add(details.Value);
+            }
+        }
+
+        return dto;
     }
 }

@@ -43,8 +43,23 @@ public class UserRepository : IUser
 
     public Task<IdentityResult> AddToRoleAsync(User user, string role) => _userManager.AddToRoleAsync(user, role);
 
-    public Task<IdentityResult> AddToRolesAsync(User user, IEnumerable<string> roles) =>
-        _userManager.AddToRolesAsync(user, roles);
+    public async Task<IdentityResult> AddToRolesAsync(User user, IEnumerable<string> roles)
+    {
+        var currentRoles = await _userManager.GetRolesAsync(user);
+        if (currentRoles.Any())
+        {
+            var remove = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            if (remove.Succeeded)
+            {
+                return await _userManager.AddToRolesAsync(user, roles);
+            }
+            else
+            {
+                return remove;
+            }
+        }
+        return await _userManager.AddToRolesAsync(user, roles);;
+    }
 
     public Task<IList<string>> GetRolesAsync(User user) => _userManager.GetRolesAsync(user);
 
@@ -55,8 +70,9 @@ public class UserRepository : IUser
         {
             return LoginError.EmailNotConfirmed;
         }
+
         var result = await _userManager.CheckPasswordAsync(user, password);
-        
+
         return result ? Result.Success() : LoginError.UserOrPassword;
     }
 
@@ -129,12 +145,12 @@ public class UserRepository : IUser
                     try
                     {
                         await RevokeRefreshTokenAsync(r.Id);
-
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
                     }
+
                     break;
                 }
             }

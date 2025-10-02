@@ -7,31 +7,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QuizStep.Core.Errors.General;
+using QuizStep.Core.Interfaces;
 
 namespace QuizStep.Application.Handlers.User
 {
     public class SetUserRoleCommandHandler : IRequestHandler<SetUserRoleCommand, Result>
     {
-        private readonly UserManager<Core.Entities.User> _userManager;
+        private readonly IUser _userManager;
 
-        public SetUserRoleCommandHandler(UserManager<Core.Entities.User> userManager)
+        public SetUserRoleCommandHandler(IUser userManager)
         {
             _userManager = userManager;
         }
 
         public async Task<Result> Handle(SetUserRoleCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(request.UserId);
-            if (user == null) return null;
+            var user = await _userManager.GetUserByIdAsync(request.UserId);
+            if (user == null) return QueryError.EntityNotExist;
 
-            var currentRoles = await _userManager.GetRolesAsync(user);
-            if (currentRoles.Any())
-                await _userManager.RemoveFromRolesAsync(user, currentRoles);
-
-            var result = await _userManager.AddToRoleAsync(user, request.Role);
+            var result = await _userManager.AddToRolesAsync(user, request.Roles);
 
             return result.Succeeded ? Result.Success() : Error.Failed;
         }
     }
-
 }

@@ -7,19 +7,23 @@ using QuizStep.Core.Primitives;
 
 namespace QuizStep.Application.Handlers.QuizResult;
 
-public class GetQuizResultUserIdQueryHandler: IRequestHandler<GetQuizResultByUserIdQuery, Result<QuizResultDto>>
+public class
+    GetQuizResultUserIdQueryHandler : IRequestHandler<GetQuizResultsByUserIdQuery, Result<IEnumerable<QuizResultDto>>>
 {
-    private readonly IQuizProvider _quizProvider;
+    private readonly IQuizResultProvider _quizResultProvider;
     private readonly IMapper _mapper;
 
-    public GetQuizResultUserIdQueryHandler(IQuizProvider quizProvider, IMapper mapper)
+    public GetQuizResultUserIdQueryHandler(IQuizResultProvider quizResultProvider, IMapper mapper)
     {
-        _quizProvider = quizProvider;
+        _quizResultProvider = quizResultProvider;
         _mapper = mapper;
     }
-    
-    public Task<Result<QuizResultDto>> Handle(GetQuizResultByUserIdQuery request, CancellationToken cancellationToken)
+
+    public async Task<Result<IEnumerable<QuizResultDto>>> Handle(GetQuizResultsByUserIdQuery request,
+        CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var results = await _quizResultProvider.GetQuizResultsByUserIdAsync(request.UserId);
+        var dto =  _mapper.Map<List<QuizResultDto>>(results.Value);
+        return dto;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuizStep.Application.Commands___Queries.User;
 
@@ -6,6 +7,7 @@ namespace QuizStep.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -26,8 +28,8 @@ namespace QuizStep.WebApi.Controllers
             return BadRequest(result.Error);
         }
 
-        [HttpPost("set-role")]
-        public async Task<IActionResult> SetRole([FromBody] SetUserRoleCommand command)
+        [HttpPost("set-roles")]
+        public async Task<IActionResult> SetRoles([FromBody] SetUserRoleCommand command)
         {
             var result = await _mediator.Send(command);
 

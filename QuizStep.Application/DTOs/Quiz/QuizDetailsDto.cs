@@ -13,5 +13,6 @@ public class QuizDetailsDto
     public string CreatorId { get; set; }
     public int TotalParticipants { get; set; }
     public QuizAccess Access { get; set; }
+    public int AccessCode { get; set; }
     public decimal AverageScore { get; set; }
 }
