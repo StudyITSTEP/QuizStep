@@ -9,9 +9,10 @@ using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
 using QuizStep.Infrastructure.Config;
 using QuizStep.Infrastructure.Data;
+using QuizStep.Infrastructure.Hubs;
 using QuizStep.Infrastructure.Repositories;
+using QuizStep.Infrastructure.Services;
 using QuizStep.WebApi.Extentions;
-using QuizStep.WebApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IEmailSender, FakeEmailService>();
 builder.Services.AddScoped<ICategory, CategoryRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IQuizResultProvider, QuizResultProvider>();
+builder.Services.AddSingleton<CurrentQuizActiveUsersService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
@@ -76,7 +78,6 @@ app.Use(async (context, next) =>
     await next();
 });
 
-app.MapHub<QuizHub>("/quizHub");
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -89,5 +90,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.MapHub<QuizHub>("api/quizHub/{quizId}");
+app.MapHub<ActiveUsersHub>("api/activeUserHub");
+app.MapHub<QuizCreatorHub>("api/creatorHub");
+app.MapHub<QuizMonitorHub>("api/quizMonitorHub/{quizId}");
 
 app.Run();
