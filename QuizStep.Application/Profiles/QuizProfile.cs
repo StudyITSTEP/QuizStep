@@ -15,6 +15,7 @@ namespace QuizStep.Application.Profiles
         {
             CreateMap<QuizDto, Quiz>()
                 .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions))
+                .ForMember(dest =>dest.Access, opt => opt.MapFrom(src => src.QuizAccess))
                 .ReverseMap();
         }
     }

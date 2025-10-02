@@ -8,29 +8,27 @@ namespace QuizStep.Application.AccessHandlers.Handlers
     public class IsQuizOwnerHandler : AuthorizationHandler<IsQuizOwnerRequirement, QuizStep.Core.Entities.Quiz> 
     {
         private readonly IUser _user;
+        private readonly IQuizProvider _quizProvider;
+        public IsQuizOwnerHandler(IUser user,  IQuizProvider quizProvider)
 
-        public IsQuizOwnerHandler(IUser user)
         {
             _user = user;
+            _quizProvider = quizProvider;
         }
 
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context, IsQuizOwnerRequirement requirement, QuizStep.Core.Entities.Quiz resource)
         {
-            var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (string.IsNullOrEmpty(userId))
+            var user = await _user.GetUserAsync();
+            var quiz = await _quizProvider.GetByIdAsync(resource.Id, new CancellationToken());
+            if (user == null || quiz == null)
+
             {
                 return;
             }
 
-            var user = await _user.GetUserByIdAsync(userId);
-            if (user == null)
-            {
-                return;
-            }
-
-            if(resource.Creator.Id == userId)
+            if(quiz.Creator.Id == user.Id)
             {
                 context.Succeed(requirement);
             }

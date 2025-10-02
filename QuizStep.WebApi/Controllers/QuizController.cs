@@ -33,11 +33,19 @@ public class QuizController : ControllerBase
         return Ok(result);
     }
     
-    [HttpGet("{id}")]
+    [HttpPost("getById")]
     [QuizAccessAuthorizationFilter("QuizAccess")]
-    public async Task<IActionResult> GetById(int id, [FromBody] string? accessCode)
+    public async Task<IActionResult> GetById(GetByIdQuizQuery query)
     {
-        var result = await _mediator.Send(new GetByIdQuizQuery() { Id = id });
+        var result = await _mediator.Send(new GetByIdQuizQuery() { Id = query.Id});
+        if (!result) return NotFound();
+        return Ok(result);
+    }
+    
+    [HttpGet("details/{id}")]
+    public async Task<IActionResult> GetDetails(int id)
+    {
+        var result = await _mediator.Send(new GetQuizDetailsQuery(id));
         if (!result) return NotFound();
         return Ok(result);
     }

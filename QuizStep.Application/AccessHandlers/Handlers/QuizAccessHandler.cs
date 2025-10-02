@@ -26,8 +26,9 @@ public class QuizAccessHandler : AuthorizationHandler<QuizAccessRequirement, Qui
         var quiz = await _quizProvider.GetByIdAsync(resource.Id, new CancellationToken());
         if (quiz == null) return;
 
-        if (resource.CreatorId == user.Id
-            || resource.Access == QuizAccess.Public
+        if (
+            //resource.CreatorId == user.Id
+            quiz.Access == QuizAccess.Public
             || resource.AccessCode == quiz.AccessCode
            )
 

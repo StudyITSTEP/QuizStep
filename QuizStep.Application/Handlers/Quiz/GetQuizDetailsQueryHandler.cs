@@ -8,17 +8,20 @@ using QuizStep.Core.Primitives;
 
 namespace QuizStep.Application.Handlers.Quiz;
 
-public class GetQuizDetailsQueryHandler: IRequestHandler<GetQuizDetailsQuery, Result<QuizDetailsDto>>
+public class GetQuizDetailsQueryHandler : IRequestHandler<GetQuizDetailsQuery, Result<QuizDetailsDto>>
 {
     private readonly IUser _user;
     private readonly IMapper _mapper;
     private readonly IQuizProvider _quizProvider;
+    private readonly IQuizResultProvider _quizResultProvider;
 
-    public GetQuizDetailsQueryHandler(IUser user, IQuizProvider quizProvider, IMapper mapper)
+    public GetQuizDetailsQueryHandler(IUser user, IQuizProvider quizProvider, IMapper mapper,
+        IQuizResultProvider quizResultProvider)
     {
         _user = user;
         _quizProvider = quizProvider;
         _mapper = mapper;
+        _quizResultProvider = quizResultProvider;
     }
 
     public async Task<Result<QuizDetailsDto>> Handle(GetQuizDetailsQuery request, CancellationToken cancellationToken)
@@ -27,12 +30,25 @@ public class GetQuizDetailsQueryHandler: IRequestHandler<GetQuizDetailsQuery, Re
         if (quiz == null) return QueryError.EntityNotExist;
 
         var dto = new QuizDetailsDto();
-        
-        var creator = await _user.GetUserByIdAsync(quiz.CreatorId);
+
+        var creator = await _user.GetUserByIdAsync(quiz.CreatorId!);
+        if (creator == null) return QueryError.EntityNotExist;
+        var average = await _quizResultProvider.GetAverageScoreByQuizAsync(quiz.Id);
+        var totalParticipants = await _quizResultProvider.GetTotalParticipantsAsync(quiz.Id);
         var fullName = creator.FirstName + " " + creator.LastName;
-        dto.CreatorName = fullName;
-        dto.CreatorEmail = creator.Email;
-        dto.TotalQuestions = quiz.Questions.Count;
-        return dto;
+
+        return new QuizDetailsDto()
+        {
+            Id = quiz.Id,
+            CreatorId = creator.Id,
+            CreatorEmail = creator.Email,
+            TotalQuestions = quiz.Questions.Count,
+            TotalParticipants = totalParticipants.Value,
+            AverageScore = average.Value,
+            Access = quiz.Access ?? 0,
+            Description = quiz.Description,
+            Name = quiz.Name,
+            CreatorName = fullName,
+        };
     }
 }

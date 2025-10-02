@@ -24,10 +24,10 @@ public class GetQuizzesQueryHandler : IRequestHandler<GetQuizzesQuery, IEnumerab
     {
         var user = await _user.GetUserAsync();
         var quizzes = await _quizProvider.GetQuizzesAsync(cancellationToken);
-        var result = quizzes
-            .Where(q => q.CreatorId == user.Id
-                             || q.Access == QuizAccess.Public);
+        // var result = quizzes
+        //     .Where(q => q.CreatorId == user.Id
+        //                      || q.Access == QuizAccess.Public);
         
-        return _mapper.Map<IEnumerable<QuizDto>>(result);
+        return _mapper.Map<IEnumerable<QuizDto>>(quizzes);
     }
 }

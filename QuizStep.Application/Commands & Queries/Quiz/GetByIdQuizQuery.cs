@@ -7,5 +7,6 @@ namespace QuizStep.Application.Commands___Queries.Quiz
     public class GetByIdQuizQuery : IRequest<Result<QuizDto>>
     {
         public int Id { get; set; }
+        public string? AccessCode { get; set; }
     }
 }

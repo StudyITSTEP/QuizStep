@@ -8,7 +8,6 @@ using QuizStep.Application.Profiles;
 using QuizStep.Core.Entities;
 using QuizStep.Core.Interfaces;
 using QuizStep.Infrastructure.Config;
-
 using QuizStep.Infrastructure.Data;
 using QuizStep.Infrastructure.Repositories;
 using QuizStep.WebApi.Extentions;
@@ -20,18 +19,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services
-    .AddIdentityCore<User>()
+    .AddIdentityCore<User>(opts => opts.SignIn.RequireConfirmedEmail = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddAuthorizationHandlers();
-builder.Services.AddScoped<IQuizProvider, QuizProviderRepository>();
 
+builder.Services.AddScoped<IQuizProvider, QuizProviderRepository>();
+builder.Services.AddScoped<IQuizResultProvider, QuizResultProvider>();
+builder.Services.AddScoped<IQuestionAnswer, QuestionAnswerRepository>();
+builder.Services.AddScoped<IAnswer, AnswerRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IEmailSender, FakeEmailService>();
 builder.Services.AddScoped<ICategory, CategoryRepository>();
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<IQuizResultProvider, QuizResultProvider>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
 builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile).Assembly);
@@ -46,16 +50,23 @@ builder.Services.AddJwtAuthentication();
 builder.Services.AddAuthorization(opts =>
 {
     opts.AddPolicy("QuizAccess", policy => policy.AddRequirements(new QuizAccessRequirement()));
-    opts.AddPolicy("IsQuizOwner", policy => policy.AddRequirements(new IsQuizOwnerRequirement()));
+    opts.AddPolicy("QuizOwner", policy => policy.AddRequirements(new IsQuizOwnerRequirement()));
+});
+builder.Services.AddCors(opts =>
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        opts.AddPolicy("front", policy => { policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); });
+    }
 });
 
-
 builder.Services.AddDbContext<ApplicationContext>(opts =>
-opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationContext>());
 
 var app = builder.Build();
+app.UseCors("front");
 app.Use(async (context, next) =>
 {
     var authHeader = context.Request.Headers["Authorization"].ToString();

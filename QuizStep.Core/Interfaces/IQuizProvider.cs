@@ -26,5 +26,7 @@ namespace QuizStep.Core.Interfaces
         Task<QuizResult?> GetQuizResultAsync(string userId, int quizId, CancellationToken cancellationToken);
         Task<Result> SetQuizResultAsync(QuizResult result, CancellationToken cancellationToken);
         Task<IEnumerable<QuizResult>> GetQuizResultsByUserIdAsync(string userId, CancellationToken cancellationToken);
+        Task<decimal> ResolveScoreAsync(int quizId, Dictionary<int, int> answers,
+            CancellationToken cancellationToken);
     }
 }

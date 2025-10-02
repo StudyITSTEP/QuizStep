@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MediatR;
 
 namespace QuizStep.Application.DTOs.User;
 
