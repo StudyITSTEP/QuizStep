@@ -50,8 +50,14 @@ public class UserRepository : IUser
 
     public async Task<Result> SignInAsync(User user, string password)
     {
+        var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+        if (!isEmailConfirmed)
+        {
+            return LoginError.EmailNotConfirmed;
+        }
         var result = await _userManager.CheckPasswordAsync(user, password);
-        return Result.Success();
+        
+        return result ? Result.Success() : LoginError.UserOrPassword;
     }
 
     public Task<string> GenerateEmailConfirmationTokenAsync(User user) =>

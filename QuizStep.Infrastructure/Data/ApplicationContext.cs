@@ -16,6 +16,7 @@ public class ApplicationContext : IdentityDbContext<User>
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     
     public DbSet<Quiz> Quizzes => Set<Quiz>();
+    public DbSet<Answer> Answers => Set<Answer>();
     public DbSet<Question> Questions { get; set; }
     public DbSet<QuizResult> QuizResults { get; set; }
     public DbSet<Category> Categories => Set<Category>();
@@ -34,6 +35,10 @@ public class ApplicationContext : IdentityDbContext<User>
         {
             e.HasMany(q => q.Answers).WithMany(q => q.Questions).UsingEntity<QuestionAnswer>();
         });
+        
+        // modelBuilder.Entity<QuestionAnswer>()
+        //     .HasKey(qa => new { qa.QuestionId, qa.AnswerId });
+        //
         base.OnModelCreating(modelBuilder);
     }
 
