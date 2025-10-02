@@ -20,13 +20,11 @@ public class ApplicationContext : IdentityDbContext<User>
     public DbSet<Question> Questions { get; set; }
     public DbSet<QuizResult> QuizResults { get; set; }
     public DbSet<Category> Categories => Set<Category>();
-    public DbSet<QuestionAnswer> QuestionAnswers { get; set; }
     public DbSet<User> Users => Set<User>();
     
     public ApplicationContext(DbContextOptions<ApplicationContext> options, IPublisher publisher) : base(options)
     {
         _publisher = publisher;
-        //Database.Migrate();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -39,9 +37,9 @@ public class ApplicationContext : IdentityDbContext<User>
         // modelBuilder.Entity<QuestionAnswer>()
         //     .HasKey(qa => new { qa.QuestionId, qa.AnswerId });
         //
+
         base.OnModelCreating(modelBuilder);
     }
-
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {

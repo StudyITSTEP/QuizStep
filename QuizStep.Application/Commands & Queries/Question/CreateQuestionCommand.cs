@@ -12,5 +12,5 @@ public class CreateQuestionCommand: IRequest<Result<QuestionDto>>
     public string Text { get; set; } = null!;
     [Required]
     public int QuizId { get; set; }
-    public List<Answer> Answers { get; set; } = null!;
+    public List<Core.Entities.Answer> Answers { get; set; } = null!;
 }
