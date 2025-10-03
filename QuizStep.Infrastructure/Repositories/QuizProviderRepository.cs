@@ -183,6 +183,7 @@ namespace QuizStep.Infrastructure.Repositories
             }
 
             var result = (correctCount * 100) / (decimal)totalQuestions;
+            result = Decimal.Round(result, 2);
             return result;
         }
     }

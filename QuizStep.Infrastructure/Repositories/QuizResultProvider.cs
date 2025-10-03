@@ -26,11 +26,17 @@ public class QuizResultProvider : IQuizResultProvider
         {
             score = q.Score
         }).ToListAsync();
-        return all.Any() ? all.Average(s => s.score) : 0;
+        return all.Any() ? Decimal.Round(all.Average(s => s.score),1) : 0;
     }
 
     public async Task<Result<IEnumerable<QuizResult>>> GetQuizResultsByUserIdAsync(string userId)
     {
         return await _context.QuizResults.Where(qr => qr.UserId == userId).ToListAsync();
+    }
+
+    public async Task<Result<IEnumerable<QuizResult>>> GetQuizResultsByQuizIdAsync(int quizId)
+    {
+        return await _context.QuizResults.Where(qr => qr.QuizId == quizId).ToListAsync();
+
     }
 }
