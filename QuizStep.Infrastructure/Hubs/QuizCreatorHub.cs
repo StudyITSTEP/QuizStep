@@ -32,7 +32,8 @@ public class QuizCreatorHub: Hub
         
         var creatorQuizzes = await _quizProvider.GetByUserAsync(userId, new CancellationToken());
         var activeUsers = await _activeUsersService.GetActiveQuizzesByCreatorAsync(creatorQuizzes);
-        await Clients.Caller.SendAsync("ActiveUsersList", activeUsers);
+        await Groups.AddToGroupAsync(Context.ConnectionId, userId);
+        await Clients.Caller.SendAsync("ActiveQuizList", activeUsers);
         await base.OnConnectedAsync();
     }
 }

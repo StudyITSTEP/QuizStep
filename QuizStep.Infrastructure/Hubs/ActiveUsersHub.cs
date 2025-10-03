@@ -35,17 +35,26 @@ public class ActiveUsersHub: Hub
         {
             UserId = userId,
             Email = user.Email,
-            CurrentQuestion = 0,
+            CurrentQuestion = 1,
             FullName = user.FirstName + " " + user.LastName,
             OnPage = true,
-            TotalQuestions = quiz.Questions.Count
+            TotalQuestions = quiz.Questions.Count,
+            ConnectionId = Context.ConnectionId,
+            CreatorId = quiz.CreatorId,
+            QuizName = quiz.Name
         };
         
         await _activeUsersService.SetActiveUserAsync(quizId, activeUser);
         await Groups.AddToGroupAsync(Context.ConnectionId, $"quiz-{quizId}");
+        await _activeUsersService.NotifyActiveUserJoinedAsync(quizId, activeUser);
         await base.OnConnectedAsync();
     }
 
+    public override async Task OnDisconnectedAsync(Exception exception)
+    {
+        await _activeUsersService.RemoveActiveUserAsync(Context.ConnectionId);
+    }
+    
     public async Task SetCurrentQuestion(string userId, int quizId, int currentQuestion)
     {
         await _activeUsersService.ChangeQuestionOrOnPageOfActiveUserAsync(quizId, userId, currentQuestion);

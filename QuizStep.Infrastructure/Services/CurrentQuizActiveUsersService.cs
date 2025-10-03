@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.SignalR;
 using QuizStep.Application.DTOs.Quiz;
 using QuizStep.Core.Entities;
@@ -14,24 +15,44 @@ public class ActiveUser
     public int CurrentQuestion { get; set; }
     public bool OnPage { get; set; }
     public int TotalQuestions { get; set; }
+    [NotMapped] public string? ConnectionId { get; set; }
+    [NotMapped] public string? CreatorId { get; set; }
+    [NotMapped] public string? QuizName { get; set; }
 }
+
+/*
+ *  Channels map:
+ *      ActiveUserFinished          - user disconnected from signalR
+ *      ActiveUser                  - sending signal user
+ *      ActiveUserCurrentQuestion   - sending current question for user
+ *      ActiveUsers                 - sending all active users
+ */
 
 public class CurrentQuizActiveUsersService
 {
     private readonly ConcurrentDictionary<int, List<ActiveUser>> _activeUsers = new();
     private readonly IHubContext<ActiveUsersHub> _activeUsersHub;
     private readonly IHubContext<QuizMonitorHub> _monitorHub;
+    private readonly IHubContext<QuizCreatorHub> _creatorHub;
 
     public CurrentQuizActiveUsersService(IHubContext<ActiveUsersHub> activeUsersHub,
-        IHubContext<QuizMonitorHub> monitorHub)
+        IHubContext<QuizMonitorHub> monitorHub, IHubContext<QuizCreatorHub> creatorHub)
     {
         _activeUsersHub = activeUsersHub;
         _monitorHub = monitorHub;
+        _creatorHub = creatorHub;
     }
-    
+
     public Task SetActiveUserAsync(int quizId, ActiveUser user)
     {
-        _activeUsers[quizId] = new List<ActiveUser> { user };
+        if (_activeUsers.ContainsKey(quizId))
+        {
+           _activeUsers[quizId].Add(user);
+        }
+        else
+        {
+            _activeUsers.TryAdd(quizId, new List<ActiveUser> { user });
+        }
         return Task.CompletedTask;
     }
 
@@ -71,17 +92,40 @@ public class CurrentQuizActiveUsersService
         return Task.CompletedTask;
     }
 
-    public Task RemoveActiveUserAsync(int quizId, string userId)
+    public async Task RemoveActiveUserAsync(string connectionId)
     {
-        var activeUser = _activeUsers[quizId].FirstOrDefault(x => x.UserId == userId);
-        if (activeUser != null)
+        foreach (KeyValuePair<int, List<ActiveUser>> entry in _activeUsers)
         {
-            _activeUsers[quizId].Remove(activeUser);
-        }
+            var activeUser = entry.Value.Find(w => w.ConnectionId == connectionId);
+            if (activeUser != null)
+            {
+                _activeUsers[entry.Key].Remove(activeUser);
+                
+                await _activeUsersHub.Groups.RemoveFromGroupAsync(connectionId, $"quiz-{entry.Key}");
+                var activeUsers = await GetActiveUsersByQuizIdAsync(entry.Key);
+                
+                await _monitorHub.Clients.Group($"quiz-{entry.Key}")
+                    .SendAsync("ActiveUserFinished", activeUser.UserId);
 
-        return Task.CompletedTask;
+                if (!entry.Value.Any())
+                {
+                    _activeUsers.TryRemove(entry.Key, out _);
+                    await _creatorHub.Clients.Group($"{activeUser.CreatorId}").SendAsync("QuizEmpty", entry.Key);
+                }
+            }
+            
+        }
     }
-    
+
+    public async Task NotifyActiveUserJoinedAsync(int quizId, ActiveUser user)
+    {
+        await _creatorHub.Clients.Group(user.CreatorId!).SendAsync("ActiveQuiz",
+            new ActiveQuizDto(quizId, user.QuizName!));
+
+        await _monitorHub.Clients.Group($"quiz-{quizId}")
+            .SendAsync("ActiveUser", user);
+    }
+
     public async Task NotifyQuestionChanged(int quizId, string userId, int question)
     {
         await _monitorHub.Clients.Group($"quiz-{quizId}")
