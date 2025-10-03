@@ -186,5 +186,12 @@ namespace QuizStep.Infrastructure.Repositories
             result = Decimal.Round(result, 2);
             return result;
         }
+
+        public async Task<IEnumerable<Quiz>> GetByCategoryAsync(int categoryId, CancellationToken cancellationToken)
+        {
+            return await _context.Quizzes
+                .Where(q => q.CategoryId == categoryId)
+                .ToListAsync(cancellationToken);
+        }        
     }
 }

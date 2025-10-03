@@ -75,4 +75,12 @@ public class QuizController : ControllerBase
         if (!result) return NotFound();
         return Ok(result);
     }
+
+    [HttpGet("category/{categoryId}")]
+    public async Task<IActionResult> GetByCategory(int categoryId, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetQuizzesByCategoryQuery { CategoryId = categoryId });
+        if (!result) return NotFound();
+        return Ok(result);
+    }
 }

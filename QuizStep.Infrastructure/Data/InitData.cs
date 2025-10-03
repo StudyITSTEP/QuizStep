@@ -29,7 +29,7 @@ public static class InitData
             await userManager.CreateAsync(user, "Aa12345!");
             await userManager.AddToRoleAsync(user, "Admin");
         }
-        
+
         var categories = new List<Category>
         {
             new Category() { Name = ".NET" },
